@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/DayNightController.gd" id="1_dnc"]
 [ext_resource type="PackedScene" path="res://scenes/ui/dialogue_box.tscn" id="3_dlg"]
 [ext_resource type="PackedScene" path="res://scenes/ui/route_journal.tscn" id="4_rj"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="5_hudscn"]
+[ext_resource type="Script" path="res://scripts/minigames/MinigameLayer.gd" id="6_mgl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fill"]
 size = Vector2(480, 270)
@@ -31,3 +32,7 @@ visible = false
 [node name="DialogueBox" parent="." instance=ExtResource("3_dlg")]
 
 [node name="RouteJournal" parent="." instance=ExtResource("4_rj")]
+
+[node name="MinigameLayer" type="CanvasLayer" parent="."]
+layer = 20
+script = ExtResource("6_mgl")

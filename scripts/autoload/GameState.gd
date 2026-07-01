@@ -97,9 +97,32 @@ func babulal_seeds_seen() -> int:
 var player_world_position: Vector2 = Vector2(240, 135)
 
 # ---------------------------------------------------------------------------
+# ACCESSIBILITY SETTINGS
+# Stored separately from the save game (in user://settings.cfg) so the choice
+# survives "New Game" and is honoured before any run begins.
+# ---------------------------------------------------------------------------
+const SETTINGS_PATH := "user://settings.cfg"
+## When true, every mini-game auto-passes so the narrative is never gated.
+var skip_minigames: bool = false
+
+func _load_settings() -> void:
+	var cfg := ConfigFile.new()
+	if cfg.load(SETTINGS_PATH) == OK:
+		skip_minigames = cfg.get_value("accessibility", "skip_minigames", false)
+
+func set_skip_minigames(value: bool) -> void:
+	skip_minigames = value
+	var cfg := ConfigFile.new()
+	cfg.load(SETTINGS_PATH)  # keep any other settings if present
+	cfg.set_value("accessibility", "skip_minigames", value)
+	cfg.save(SETTINGS_PATH)
+
+# ---------------------------------------------------------------------------
 # READY
 # ---------------------------------------------------------------------------
 func _ready() -> void:
+	# Load persistent accessibility settings (independent of the save game)
+	_load_settings()
 	# Initialise default routes for all known NPCs
 	_init_default_routes()
 	# Attempt to load an existing save; on first run this is a no-op

@@ -78,8 +78,17 @@
       },
 
       "developing": {
-        "start": "m2_greeting",
+        "start": "m2_nose",
         "nodes": {
+          "m2_nose": {
+            "speaker": "NARRATOR",
+            "text": "You set the tiffin by her door. The flat gives itself away in small signs this morning — if you can tell which ones actually matter.",
+            "minigame": {"type": "nose_board", "stat": "NOSE", "title": "What changed in Flat 4B?", "instruction": "Some of these are true tells about her state of mind. Select the ones that matter, then confirm.", "clues": [{"text": "Old paper and dried marigold — a keepsake box has been opened.", "correct": true}, {"text": "Ghee on the air from the stairwell — she actually cooked today.", "correct": true}, {"text": "A radio playing film songs next door.", "correct": false}, {"text": "The stairwell bulb is out again.", "correct": false}]},
+            "success_next": "m2_greeting",
+            "fail_next": "m2_greeting",
+            "success_effects": {"add_note": "Read the flat right: she's been quietly going through his things."},
+            "fail_effects": {}
+          },
           "m2_greeting": {
             "speaker": "Mrs. Mehta",
             "text": "I found some of his old photographs last night. I hadn't opened that box in years.",
@@ -264,8 +273,17 @@
               {"skill": "EMPATHY", "text": "She's not shaking anymore. She's decided.", "requires_stat": 1}
             ],
             "choices": [
-              {"id": "c1a", "text": "I'm here. Whenever you're ready.", "stat_check": null, "next": "sr_2", "effects": {}}
+              {"id": "c1a", "text": "I'm here. Whenever you're ready.", "stat_check": null, "next": "sr_silence", "effects": {}}
             ]
+          },
+          "sr_silence": {
+            "speaker": "NARRATOR",
+            "text": "She unfolds the letter with both hands. Everything in you wants to fill the quiet — but this moment is hers. Wait for it.",
+            "minigame": {"type": "silence", "stat": "EMPATHY"},
+            "success_next": "sr_2",
+            "fail_next": "sr_2",
+            "success_effects": {"add_note": "Held the silence while she found the nerve to read."},
+            "fail_effects": {}
           },
           "sr_2": {
             "speaker": "Spirit — Mrs. Mehta",
@@ -364,8 +382,17 @@
       },
 
       "developing": {
-        "start": "r2_start",
+        "start": "r2_route",
         "nodes": {
+          "r2_route": {
+            "speaker": "NARRATOR",
+            "text": "Raju spooks easily. To reach the temple steps without half the lane watching, you have to read the street first.",
+            "minigame": {"type": "route", "stat": "STREET_SENSE"},
+            "success_next": "r2_start",
+            "fail_next": "r2_start",
+            "success_effects": {"add_note": "Reached Raju by the quiet way — he stayed put."},
+            "fail_effects": {}
+          },
           "r2_start": {
             "speaker": "Raju",
             "text": "You came back. With extra.",
@@ -571,8 +598,17 @@
     "dialogue_trees": {
 
       "first_meeting": {
-        "start": "d1_start",
+        "start": "d1_carry",
         "nodes": {
+          "d1_carry": {
+            "speaker": "NARRATOR",
+            "text": "The municipal lane is a crush of petitioners and parked scooters. You thread through with the stack on your shoulder, trying not to let a single tin tip before you reach Window 3.",
+            "minigame": {"type": "balance", "stat": "STEADY_HANDS"},
+            "success_next": "d1_start",
+            "fail_next": "d1_start",
+            "success_effects": {"add_note": "Carried the stack clean through the municipal crush."},
+            "fail_effects": {"add_note": "Jostled in the lane — Desai's rice arrived a little cold."}
+          },
           "d1_start": {
             "speaker": "Desai Sahib",
             "text": "New delivery person, hah? Your parking permit is not valid for this lane. I can overlook it... for a consideration.",
@@ -1035,8 +1071,17 @@
               {"skill": "GRIEF", "text": "The truth that was too heavy to carry alone. Now it has wheels.", "requires_stat": 1}
             ],
             "choices": [
-              {"id": "c2a", "text": "(Carry the words to Pitaji's door in the spirit-world.)", "stat_check": null, "next": "sr_3", "effects": {}}
+              {"id": "c2a", "text": "(Carry the words to Pitaji's door in the spirit-world.)", "stat_check": null, "next": "sr_dream", "effects": {}}
             ]
+          },
+          "sr_dream": {
+            "speaker": "NARRATOR",
+            "text": "You take his words like a warm tin and step into the dream-street. It shifts underfoot, trying to turn you back. His father's door waits on the far side.",
+            "minigame": {"type": "dreamscape", "stat": "GRIEF"},
+            "success_next": "sr_3",
+            "fail_next": "sr_3",
+            "success_effects": {},
+            "fail_effects": {}
           },
           "sr_3": {
             "speaker": "NARRATOR",
@@ -1131,8 +1176,17 @@
       },
 
       "developing": {
-        "start": "c2_homesick",
+        "start": "c2_chai",
         "nodes": {
+          "c2_chai": {
+            "speaker": "NARRATOR",
+            "text": "Champa waves you behind the counter. 'Make it yourself today, beta — I'm not in the mood to be barked at by my own kettle.' The right cup depends on the kind of day she's having.",
+            "minigame": {"type": "prep", "stat": "EMPATHY", "title": "Brew chai for the mood", "instruction": "She's quiet and far away this morning. Choose what belongs in a cup for a homesick heart, then pour.", "clues": [{"text": "Extra ginger — warmth for a cold feeling.", "correct": true}, {"text": "Cardamom — the smell of somebody's mother's kitchen.", "correct": true}, {"text": "Three spoons of sugar to force some cheer.", "correct": false}, {"text": "Strong and black, no milk — a wake-up slap.", "correct": false}], "confirm_text": "Pour", "assist_text": "You already know her tells: warmth and memory, nothing that shouts."},
+            "success_next": "c2_homesick",
+            "fail_next": "c2_homesick",
+            "success_effects": {"route_update": {"trust_level": 1}, "add_note": "Brewed her the right cup for a homesick morning."},
+            "fail_effects": {}
+          },
           "c2_homesick": {
             "speaker": "Champa Tai",
             "text": "Baba — sorry, I keep calling you that — something in your chai today? It tastes different to me.",

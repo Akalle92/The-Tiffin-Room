@@ -11,11 +11,16 @@ signal node_displayed(node_data: Dictionary)
 signal choices_presented(choices: Array)
 signal voice_interjected(skill: String, text: String)
 signal dialogue_ended(npc_id: String)
+## Emitted when a node asks to run a mini-game. MinigameLayer handles it and
+## calls resolve_minigame() with the result.
+signal minigame_requested(config: Dictionary)
 
 # ---------------------------------------------------------------------------
 # STATE
 # ---------------------------------------------------------------------------
 var is_active: bool = false
+## True while a mini-game overlay is running (dialogue is paused, input frozen).
+var is_minigame_active: bool = false
 var _npc_db: Dictionary = {}           # parsed npc_data.json
 var _skill_voices: Dictionary = {}     # parsed skill_voices.json
 
@@ -103,13 +108,47 @@ func choose(choice_index: int) -> void:
 
 ## Call this to advance past a node with no choices (auto-advance).
 func advance() -> void:
-	if not is_active:
+	if not is_active or is_minigame_active:
 		return
 	var current_node: Dictionary = _current_nodes.get(_current_node_id, {})
 	if current_node.get("choices", []).size() > 0:
 		# Node has choices — shouldn't be calling advance()
 		return
+	# Mini-game node: launch the overlay instead of advancing. The text has
+	# already been shown as narrative setup; resolve_minigame() advances after.
+	var minigame: Variant = current_node.get("minigame", null)
+	if minigame is Dictionary and not minigame.is_empty():
+		_launch_minigame(minigame)
+		return
 	var next_id: String = current_node.get("next", "")
+	_advance_to(next_id)
+
+# ---------------------------------------------------------------------------
+# MINI-GAMES
+# ---------------------------------------------------------------------------
+func _launch_minigame(minigame: Dictionary) -> void:
+	is_minigame_active = true
+	var stat: String = minigame.get("stat", "")
+	var config: Dictionary = minigame.duplicate()
+	config["stat_value"] = GameState.get_stat(stat) if stat != "" else 0
+	config["skip"] = GameState.skip_minigames
+	minigame_requested.emit(config)
+
+## Called by MinigameLayer when the overlay finishes.
+## result = {"success": bool, "quality": float, "skipped": bool}
+func resolve_minigame(result: Dictionary) -> void:
+	if not is_minigame_active:
+		return
+	is_minigame_active = false
+	var node: Dictionary = _current_nodes.get(_current_node_id, {})
+	var success: bool = result.get("success", true)
+	# Skipped mini-games are treated as a gentle pass so nobody is ever blocked.
+	if result.get("skipped", false):
+		success = true
+	var eff_key: String = "success_effects" if success else "fail_effects"
+	_apply_effects(node.get(eff_key, {}))
+	var next_key: String = "success_next" if success else "fail_next"
+	var next_id: String = node.get(next_key, node.get("next", ""))
 	_advance_to(next_id)
 
 # ---------------------------------------------------------------------------
@@ -201,7 +240,9 @@ func _advance_to(next_id: String) -> void:
 	_display_current_node()
 
 func _apply_choice_effects(choice: Dictionary) -> void:
-	var effects: Dictionary = choice.get("effects", {})
+	_apply_effects(choice.get("effects", {}))
+
+func _apply_effects(effects: Dictionary) -> void:
 	if effects.is_empty():
 		return
 
@@ -234,6 +275,7 @@ func _apply_choice_effects(choice: Dictionary) -> void:
 func _end_dialogue() -> void:
 	var npc_id: String = _current_npc_id
 	is_active = false
+	is_minigame_active = false
 	_current_npc_id = ""
 	_current_tree_id = ""
 	_current_nodes = {}

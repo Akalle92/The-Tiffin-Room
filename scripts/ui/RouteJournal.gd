@@ -61,6 +61,9 @@ func _apply_ui_skin() -> void:
 		right_panel.add_theme_stylebox_override("panel", style)
 
 func _unhandled_input(event: InputEvent) -> void:
+	# Don't let the journal open over dialogue or a mini-game overlay.
+	if not visible and DialogueManager.is_active:
+		return
 	if event.is_action_pressed("toggle_journal"):
 		toggle()
 		get_viewport().set_input_as_handled()

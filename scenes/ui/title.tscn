@@ -92,3 +92,10 @@ custom_minimum_size = Vector2(140, 24)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Quit"
+
+[node name="SkipMinigamesToggle" type="CheckButton" parent="Menu"]
+custom_minimum_size = Vector2(140, 22)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 9
+text = "Skip mini-games"

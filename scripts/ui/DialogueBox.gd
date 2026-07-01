@@ -96,6 +96,8 @@ func _process(delta: float) -> void:
 # ---------------------------------------------------------------------------
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible: return
+	# While a mini-game overlay is running, it owns input.
+	if DialogueManager.is_minigame_active: return
 
 	if event.is_action_pressed("ui_accept") or event.is_action_pressed("interact"):
 		if _typing:
