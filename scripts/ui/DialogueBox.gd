@@ -178,6 +178,10 @@ func _build_choice_buttons() -> void:
 	_clear_choices()
 	for i in range(_current_choices.size()):
 		var choice: Dictionary = _current_choices[i]
+		# Hidden choices (unmet flag conditions) are skipped, but the loop index
+		# is preserved so DialogueManager.choose(i) still maps to node.choices[i].
+		if choice.get("hidden", false):
+			continue
 		var btn := Button.new()
 		var locked: bool = choice.get("locked", false)
 

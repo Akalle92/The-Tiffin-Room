@@ -161,6 +161,12 @@ func _pick_tree(npc_id: String) -> String:
 	var spirit_unlocked: bool = route.get("spirit_unlocked", false)
 	var is_night: bool = GameState.is_night
 
+	# Convergence beat: once the neighbourhood is visibly mending, Champa (the
+	# social hub) reflects on it — one time, by day.
+	if npc_id == "champa" and not is_night and route.get("day_state", 0) >= 2:
+		if GameState.spirits_resolved_count() >= 3 and not GameState.get_flag("champa_convergence_seen", false):
+			return "convergence"
+
 	if is_night and spirit_unlocked:
 		var spirit_resolved: bool = route.get("spirit_resolved", false)
 		if spirit_resolved:
@@ -214,7 +220,15 @@ func _display_current_node() -> void:
 				"text":        choice.get("text", ""),
 				"locked":      false,
 				"lock_reason": "",
+				"hidden":      false,
 			}
+			# Flag-gated visibility (used for cross-deliveries between NPCs).
+			var req_flag: String = choice.get("requires_flag", "")
+			var req_not_flag: String = choice.get("requires_not_flag", "")
+			if req_flag != "" and not GameState.get_flag(req_flag, false):
+				entry["hidden"] = true
+			if req_not_flag != "" and GameState.get_flag(req_not_flag, false):
+				entry["hidden"] = true
 			if stat_check is Dictionary:
 				var skill: String  = stat_check.get("skill", "")
 				var threshold: int = stat_check.get("threshold", 0)

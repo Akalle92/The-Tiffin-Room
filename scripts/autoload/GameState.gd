@@ -200,6 +200,14 @@ func update_route(npc_id: String, updates: Dictionary) -> void:
 		set_flag("game_completed", true)
 		game_completed.emit()
 
+## Count of NPCs whose spirit arc is resolved (drives Champa's convergence beat).
+func spirits_resolved_count() -> int:
+	var n := 0
+	for npc_id in routes:
+		if routes[npc_id].get("spirit_resolved", false):
+			n += 1
+	return n
+
 ## True when every route's spirit arc has been resolved.
 func all_spirits_resolved() -> bool:
 	if routes.is_empty():

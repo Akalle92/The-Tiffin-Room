@@ -439,7 +439,18 @@
             "text": "You came back. With extra.",
             "voice_interjections": [],
             "choices": [
+              {"id": "c1b", "text": "Champa from the corner stall sent you this — a vada and a sweet chai. She's been worried.", "stat_check": null, "requires_flag": "champa_gift_for_raju", "requires_not_flag": "raju_got_champa_gift", "next": "r2_gift", "effects": {"set_flag": "raju_got_champa_gift", "route_update": {"trust_level": 2}, "add_note": "Delivered Champa's packet to Raju. Being counted by a stranger landed harder than the food."}},
               {"id": "c1a", "text": "I said I would. How long have you been sleeping here?", "stat_check": null, "next": "r2_how_long", "effects": {}}
+            ]
+          },
+          "r2_gift": {
+            "speaker": "Raju",
+            "text": "...She knows my name? I never told anyone my name here.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "Being known without having to ask for it — that's the exact thing he ran away hoping to find.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "g2", "text": "People on this lane notice more than you'd think. You're not as invisible as you feel.", "stat_check": null, "next": "r2_how_long", "effects": {}}
             ]
           },
           "r2_how_long": {
@@ -1376,8 +1387,59 @@
             "speaker": "Champa Tai",
             "text": "I made this city my home. That was the deal I made with myself when I came at twenty-two. But sometimes... sometimes the old home doesn't care about your deal.",
             "voice_interjections": [],
+            "choices": [
+              {"id": "c3a", "text": "Take care, Champa Tai.", "stat_check": null, "next": "c2_raju_gift", "effects": {}}
+            ]
+          },
+          "c2_raju_gift": {
+            "speaker": "Champa Tai",
+            "text": "Wait — before you go. That boy who sleeps rough on the temple steps. Raju. He thinks nobody's clocked him. Take him this, na? A vada and a sweet chai. Don't tell him it's from me. Actually — do tell him. Let him know somebody counted him.",
+            "voice_interjections": [
+              {"skill": "STREET_SENSE", "text": "She misses nothing on this lane. Of course she clocked the runaway before you did.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "g1", "text": "I'll make sure he gets it.", "stat_check": null, "next": "c2_gift_end", "effects": {"set_flag": "champa_gift_for_raju", "add_note": "Champa noticed Raju too. Gave me a packet to carry to him."}}
+            ]
+          },
+          "c2_gift_end": {
+            "speaker": "Champa Tai",
+            "text": "Good boy. Tell him the tea stall knows his order for whenever he wants it. Go on, before the vada goes cold.",
+            "voice_interjections": [],
             "choices": [],
             "next": "END"
+          }
+        }
+      },
+
+      "convergence": {
+        "start": "conv1",
+        "nodes": {
+          "conv1": {
+            "speaker": "Champa Tai",
+            "text": "Something's shifting on this lane lately, beta. The widow in 4B leaves her window open again. That boy turned up at the steps in daylight, bold as you like. Even Desai Sahib said 'good morning' the other day like he meant it. What exactly are you doing on your route?",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "A neighbourhood is just people who've agreed to notice each other. You've been reminding them how.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1", "text": "Just delivering tiffins.", "stat_check": null, "next": "conv2", "effects": {}},
+              {"id": "c2", "text": "[EMPATHY 2] Carrying what people couldn't say for themselves.", "stat_check": {"skill": "EMPATHY", "threshold": 2}, "next": "conv2_e", "fail_next": "conv2", "effects": {}}
+            ]
+          },
+          "conv2": {
+            "speaker": "Champa Tai",
+            "text": "Hah. 'Just.' Your grandfather said it in that same voice. Go on — but take a chai first. On the house, for the postman of this whole gully.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "e", "text": "(Take the chai.)", "stat_check": null, "next": "END", "effects": {"set_flag": "champa_convergence_seen", "add_note": "The lane is knitting itself back together. Champa sees it. So do you."}}
+            ]
+          },
+          "conv2_e": {
+            "speaker": "Champa Tai",
+            "text": "...Yes. That. Exactly that. Your baba would be unbearable with pride right now. Take a chai — on the house, postman of the gully.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "e2", "text": "(Take the chai.)", "stat_check": null, "next": "END", "effects": {"set_flag": "champa_convergence_seen", "add_note": "The lane is knitting itself back together. Champa sees it. So do you."}}
+            ]
           }
         }
       },
