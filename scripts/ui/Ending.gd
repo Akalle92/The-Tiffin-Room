@@ -22,7 +22,7 @@ func _on_to_title() -> void:
 # EPILOGUE ASSEMBLY
 # ---------------------------------------------------------------------------
 func _flag(name: String) -> bool:
-	return GameState.get_flag(name, false)
+	return bool(GameState.get_flag(name, false))
 
 func _build_epilogue() -> String:
 	var lines: Array[String] = []

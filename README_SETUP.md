@@ -15,12 +15,17 @@ The editor will scan and import all files. A few "missing texture" warnings on f
 
 | Key | Action |
 |-----|--------|
-| WASD / Arrow Keys | Move |
+| WASD / Arrow Keys | Move (also used inside movement/traversal mini-games) |
 | E | Interact with NPC (deliver tiffin / talk) |
 | J | Open Route Journal |
+| R | Rest until morning (night only) |
 | N | Toggle Day ↔ Night (**debug only**) |
 | Esc / X | Close dialogue / journal |
-| Enter / Space | Advance dialogue |
+| Enter / Space | Advance dialogue / act in timing mini-games |
+
+Mini-games are **optional**. Every one has an on-screen **Skip** button, and a
+global **"Skip mini-games"** toggle lives on the Title screen (persisted to
+`user://settings.cfg`). A higher relevant stat makes each mini-game easier.
 
 ---
 
@@ -57,10 +62,20 @@ scripts/
   ui/HUD.gd             ← Time bar, delivery counter, stat display
   ui/DayNightClock.gd   ← Radial clock widget
   systems/StatCheck.gd  ← Stat roll helpers (class_name, static)
+  minigames/            ← Optional "gameplay verb" mini-games
+	MinigameBase.gd     ← Shared overlay scaffold (skip button, result signal)
+	MinigameLayer.gd    ← Bridges DialogueManager <-> mini-game scenes
+	SelectClues.gd      ← NOSE deduction board + Champa chai matching
+	Balance.gd          ← STEADY_HANDS carry-the-stack
+	Route.gd            ← STREET_SENSE read-the-street
+	Dreamscape.gd       ← spirit-world traversal
+	Silence.gd          ← "let the silence land" timing beat
+
+scenes/minigames/       ← One thin .tscn per mini-game (root + script)
 
 data/
   dialogue/
-	npc_data.json       ← ALL NPC dialogue trees (5 NPCs, 7 trees each)
+	npc_data.json       ← ALL dialogue trees (5 NPCs + Babulal finale; incl. small_talk, convergence, spirit_hardened)
 	skill_voices.json   ← EMPATHY/NOSE/STEADY_HANDS/STREET_SENSE/GRIEF voice lines
 
 assets/
@@ -84,9 +99,23 @@ Central truth for everything. Tracks:
 
 ### DialogueManager (Autoload)
 - Call `DialogueManager.start_dialogue("mrs_mehta")` from any NPC
-- Auto-selects the right tree based on route progress
-- Emits `node_displayed`, `choices_presented`, `voice_interjected`, `dialogue_ended`
+- Auto-selects the right tree based on route progress (`first_meeting` →
+  `developing` → `small_talk` → `trust`; night: `spirit_intro` →
+  `spirit_resolution`, or `spirit_hardened` if neglected, then `spirit_aftermath`)
+- Emits `node_displayed`, `choices_presented`, `voice_interjected`,
+  `minigame_requested`, `dialogue_ended`
 - `DialogueBox.gd` connects to these signals and renders the UI
+
+### Mini-games / Neglect / Finale (new systems)
+- **Mini-games**: a node with a `"minigame"` block pauses dialogue, runs an
+  overlay via `MinigameLayer`, then branches to `success_next` / `fail_next`.
+  Fail is always narrative-only (never a game over) and every game is skippable.
+- **Neglect / decay**: a spirit left unresolved for `DECAY_DAYS` (GameState)
+  becomes `hardened` — still resolvable, but only through the bittersweet
+  `spirit_hardened` tree. Surfaced in the journal as "Distant".
+- **Finale**: when all five spirits resolve, `DayNightController` plays the
+  `babulal` `finale` tree (the protagonist's own last delivery), then the
+  choice-reflective ending assembled in `Ending.gd` from story flags.
 
 ### Dialogue Tree JSON Format
 ```json
@@ -107,17 +136,29 @@ Central truth for everything. Tracks:
 				"id": "c1a",
 				"text": "Player choice text",
 				"stat_check": {"skill": "GRIEF", "threshold": 2},
+				"requires_flag": "only_show_if_set",
+				"requires_not_flag": "hide_once_set",
 				"next": "next_node_id",
 				"fail_next": "fallback_node_id",
 				"effects": {
 				  "route_update": {"day_state": 2},
 				  "stat_modify": {"EMPATHY": 1},
 				  "set_flag": "flag_name",
+				  "set_flags": ["flag_a", "flag_b"],
 				  "add_note": "Note added to journal"
 				}
 			  }
 			],
 			"next": "auto_advance_node_or_END"
+		  },
+		  "minigame_node": {
+			"speaker": "NARRATOR",
+			"text": "Narrative setup shown before the mini-game.",
+			"minigame": {"type": "nose_board", "stat": "NOSE"},
+			"success_next": "node_if_win",
+			"fail_next": "node_if_fail",
+			"success_effects": {"add_note": "..."},
+			"fail_effects": {}
 		  }
 		}
 	  }
@@ -125,6 +166,9 @@ Central truth for everything. Tracks:
   }
 }
 ```
+
+Mini-game `type` values: `nose_board`, `prep`, `balance`, `route`,
+`dreamscape`, `silence`. Node-level `"effects"` are also applied on display.
 
 ### NPC Scene Setup
 Each NPC instance in `city_day.tscn` needs its `npc_id` set in the Inspector:
