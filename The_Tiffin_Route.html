@@ -1,0 +1,2507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>The Tiffin Route</title>
+<style>
+  :root{
+    --turmeric:#e8a72e; --brick:#a8432a; --monsoon:#5b7a4b; --dusk:#f2c879;
+    --indigo:#1a1b3a; --lantern:#ffcf7a; --ink:#2b1d12; --paper:#f4e7cf;
+    --tin:#cdd2d6; --tin-dark:#8b9398;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0c0a12;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;color:#f4e7cf;-webkit-font-smoothing:antialiased}
+  #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,#241a2e 0%,#0c0a12 80%)}
+  canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+  #game{box-shadow:0 0 60px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04)}
+
+  /* ---------- generic overlay ---------- */
+  .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:50}
+  .overlay.show{display:flex}
+
+  /* ---------- title ---------- */
+  #title{flex-direction:column;background:radial-gradient(ellipse at 50% 40%,#3a2342 0%,#120c1a 75%);z-index:60}
+  #title h1{font-size:clamp(34px,7vw,76px);letter-spacing:.04em;color:var(--dusk);
+    text-shadow:0 2px 0 #7a3b1e,0 0 30px rgba(232,167,46,.35);font-weight:800;margin-bottom:.1em}
+  #title .sub{color:#caa;letter-spacing:.45em;text-transform:uppercase;font-size:clamp(10px,1.6vw,14px);margin-bottom:2.2em;opacity:.8}
+  .menu{display:flex;flex-direction:column;gap:12px;width:min(330px,80vw)}
+  .btn{background:rgba(244,231,207,.06);border:1px solid rgba(244,231,207,.25);color:var(--paper);
+    padding:13px 18px;border-radius:10px;font-size:16px;cursor:pointer;letter-spacing:.03em;
+    transition:.15s;backdrop-filter:blur(2px);text-align:center}
+  .btn:hover{background:rgba(232,167,46,.18);border-color:var(--turmeric);transform:translateY(-1px)}
+  .btn:disabled{opacity:.35;cursor:default;transform:none}
+  .btn.primary{background:linear-gradient(180deg,#e8a72e,#c2731f);color:#2b1d12;border:none;font-weight:700}
+  .btn.primary:hover{filter:brightness(1.08)}
+  #title .credit{position:absolute;bottom:16px;font-size:11px;color:rgba(244,231,207,.4);letter-spacing:.1em}
+
+  /* ---------- cinematic ---------- */
+  #cine{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#06040a;z-index:70;flex-direction:column;cursor:pointer}
+  #cine.show{display:flex}
+  #cineArt{position:absolute;inset:0;opacity:.5;background-size:cover;background-position:center;transition:opacity 1.4s, transform 9s ease-out}
+  #cineVeil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,4,10,.2),rgba(6,4,10,.85))}
+  #cineText{position:relative;max-width:760px;padding:0 28px;text-align:center;font-size:clamp(18px,2.6vw,27px);
+    line-height:1.65;color:#f4e7cf;text-shadow:0 2px 14px #000;opacity:0;transition:opacity 1.1s}
+  #cineText.in{opacity:1}
+  #cineHint{position:absolute;bottom:26px;right:30px;font-size:12px;letter-spacing:.18em;color:rgba(244,231,207,.5);text-transform:uppercase}
+
+  /* ---------- HUD ---------- */
+  #hud{position:fixed;inset:0;pointer-events:none;z-index:20;display:none;font-size:13px}
+  #hud.show{display:block}
+  #hudTop{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:12px 14px;
+    background:linear-gradient(180deg,rgba(8,6,14,.55),transparent)}
+  .clockWrap{display:flex;align-items:center;gap:10px}
+  #clockOrb{width:30px;height:30px;border-radius:50%;box-shadow:0 0 14px;transition:.6s}
+  .day #clockOrb{background:radial-gradient(circle at 35% 35%,#ffe6a8,#e8a72e);box-shadow:0 0 16px rgba(232,167,46,.8)}
+  .night #clockOrb{background:radial-gradient(circle at 35% 35%,#cfe0ff,#6f7bd6);box-shadow:0 0 16px rgba(120,140,230,.8)}
+  #clockText b{color:var(--dusk);font-weight:700}
+  #clockText small{display:block;opacity:.7;letter-spacing:.18em;text-transform:uppercase;font-size:10px}
+  #stats{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;max-width:60%}
+  .stat{display:flex;align-items:center;gap:5px;background:rgba(12,9,18,.5);border:1px solid rgba(244,231,207,.12);
+    border-radius:7px;padding:4px 8px}
+  .stat .dot{width:8px;height:8px;border-radius:50%}
+  .stat .pips{display:flex;gap:2px}
+  .stat .pip{width:5px;height:5px;border-radius:1px;background:rgba(244,231,207,.18)}
+  .stat .pip.on{background:#fff}
+  .stat .nm{font-size:10px;letter-spacing:.06em;opacity:.85}
+  #hudBottom{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;display:flex;justify-content:space-between;align-items:flex-end;
+    background:linear-gradient(0deg,rgba(8,6,14,.5),transparent)}
+  #objective{background:rgba(12,9,18,.55);border:1px solid rgba(244,231,207,.14);border-left:3px solid var(--turmeric);
+    border-radius:8px;padding:8px 12px;max-width:62%}
+  #objective .lbl{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--turmeric);margin-bottom:2px}
+  #keys{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .key{background:rgba(12,9,18,.5);border:1px solid rgba(244,231,207,.14);border-radius:6px;padding:4px 8px;font-size:11px}
+  .key b{color:var(--dusk)}
+  #toast{position:absolute;top:64px;left:50%;transform:translateX(-50%) translateY(-12px);opacity:0;transition:.4s;
+    background:rgba(12,9,18,.82);border:1px solid var(--turmeric);border-radius:9px;padding:9px 16px;color:var(--dusk);
+    font-size:13px;letter-spacing:.02em;max-width:80%;text-align:center}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #interactPrompt{position:absolute;opacity:0;transition:.15s;pointer-events:none;transform:translate(-50%,-100%);
+    background:var(--turmeric);color:#2b1d12;font-weight:700;font-size:11px;padding:3px 8px;border-radius:6px;white-space:nowrap}
+  #interactPrompt.show{opacity:1}
+  #interactPrompt:after{content:"";position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);
+    border:5px solid transparent;border-top-color:var(--turmeric)}
+
+  /* ---------- dialogue ---------- */
+  #dlg{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;justify-content:flex-end;
+    background:linear-gradient(0deg,rgba(6,4,10,.45),transparent 55%)}
+  #dlg.show{display:flex}
+  #dlgVoices{padding:0 max(14px,calc(50vw - 430px)) 6px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+  .voice{align-self:flex-start;max-width:min(560px,84vw);background:rgba(10,8,16,.7);border-radius:9px;padding:7px 12px;
+    font-style:italic;font-size:14px;line-height:1.45;border-left:3px solid;animation:vin .35s ease}
+  .voice .vn{font-style:normal;font-weight:800;font-size:10px;letter-spacing:.16em;margin-right:7px;opacity:.95}
+  @keyframes vin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  #dlgBox{background:linear-gradient(180deg,#1d2226,#12161a);border-top:2px solid var(--tin-dark);
+    box-shadow:0 -10px 40px rgba(0,0,0,.5);padding:16px max(16px,calc(50vw - 430px)) 18px;position:relative}
+  #dlgBox:before{content:"";position:absolute;top:-2px;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--turmeric),transparent)}
+  .speakerRow{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+  #portrait{width:52px;height:52px;border-radius:9px;background:#0c0a12;border:2px solid var(--tin-dark);flex:none;image-rendering:pixelated}
+  #speaker{font-weight:800;letter-spacing:.03em;font-size:16px;color:var(--dusk)}
+  #speaker.spirit{color:#bcd0ff;text-shadow:0 0 12px rgba(150,180,255,.6)}
+  #speaker .ttl{display:block;font-size:11px;font-weight:500;letter-spacing:.1em;color:rgba(244,231,207,.55);text-transform:uppercase}
+  #dlgText{font-size:clamp(16px,2vw,19px);line-height:1.6;min-height:3.2em;color:#f4e7cf}
+  #dlgText.narr{font-style:italic;color:#d8c8e6}
+  #choices{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+  .choice{background:rgba(244,231,207,.05);border:1px solid rgba(244,231,207,.18);color:#f4e7cf;text-align:left;
+    padding:11px 14px;border-radius:9px;cursor:pointer;font-size:15px;line-height:1.4;transition:.13s}
+  .choice:hover{background:rgba(232,167,46,.16);border-color:var(--turmeric);transform:translateX(3px)}
+  .choice .tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;padding:1px 7px;border-radius:5px;margin-right:8px;vertical-align:middle}
+  .choice.locked{opacity:.62}
+  .choice.locked:hover{transform:none}
+  #continueHint{margin-top:12px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,231,207,.5);text-align:right}
+
+  /* ---------- journal ---------- */
+  #journal{position:fixed;inset:0;z-index:40;display:none;background:rgba(6,4,10,.86);backdrop-filter:blur(3px);
+    align-items:center;justify-content:center}
+  #journal.show{display:flex}
+  .jbook{width:min(840px,92vw);max-height:88vh;background:linear-gradient(180deg,#2a1d12,#1c130b);
+    border:1px solid rgba(232,167,46,.3);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .jhead{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid rgba(232,167,46,.2);
+    background:rgba(0,0,0,.2)}
+  .jhead h2{color:var(--dusk);letter-spacing:.04em;font-size:22px}
+  .jtabs{display:flex;gap:6px;padding:12px 22px 0}
+  .jtab{background:transparent;border:none;color:rgba(244,231,207,.6);padding:7px 14px;border-radius:8px 8px 0 0;cursor:pointer;font-size:14px}
+  .jtab.active{background:rgba(232,167,46,.16);color:var(--dusk)}
+  .jbody{padding:14px 22px 22px;overflow-y:auto}
+  .routeCard{background:rgba(244,231,207,.04);border:1px solid rgba(244,231,207,.1);border-radius:11px;padding:14px 16px;margin-bottom:12px}
+  .routeCard .rc-top{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .rc-av{width:40px;height:40px;border-radius:8px;image-rendering:pixelated;border:1px solid rgba(255,255,255,.1)}
+  .rc-name{font-weight:700;color:var(--dusk);font-size:16px}
+  .rc-name .t{display:block;font-size:11px;font-weight:400;color:rgba(244,231,207,.5);letter-spacing:.08em}
+  .rc-badge{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:.08em;padding:4px 10px;border-radius:20px}
+  .b-new{background:rgba(244,231,207,.12);color:#cbb}
+  .b-prog{background:rgba(232,167,46,.2);color:var(--dusk)}
+  .b-spirit{background:rgba(120,140,230,.22);color:#bcd0ff}
+  .b-done{background:rgba(91,122,75,.3);color:#bfe0a8}
+  .rc-track{display:flex;gap:4px;margin:8px 0}
+  .rc-step{flex:1;height:5px;border-radius:3px;background:rgba(244,231,207,.12)}
+  .rc-step.on{background:var(--turmeric)}
+  .rc-step.spirit{background:#8fa6ff}
+  .rc-notes{list-style:none;margin-top:8px;display:flex;flex-direction:column;gap:5px}
+  .rc-notes li{font-size:13px;color:rgba(244,231,207,.82);padding-left:16px;position:relative;line-height:1.45}
+  .rc-notes li:before{content:"•";position:absolute;left:2px;color:var(--turmeric)}
+  .skillCard{display:flex;gap:14px;align-items:flex-start;background:rgba(244,231,207,.04);border-radius:11px;padding:13px 15px;margin-bottom:10px;border:1px solid rgba(244,231,207,.08)}
+  .skillCard .sk-orb{width:34px;height:34px;border-radius:50%;flex:none;margin-top:2px;box-shadow:0 0 12px}
+  .skillCard .sk-nm{font-weight:800;letter-spacing:.1em;font-size:14px}
+  .skillCard .sk-pips{display:flex;gap:3px;margin:5px 0 7px}
+  .skillCard .sk-pips i{width:9px;height:9px;border-radius:2px;background:rgba(244,231,207,.16)}
+  .skillCard .sk-desc{font-size:13px;font-style:italic;color:rgba(244,231,207,.75);line-height:1.45}
+
+  /* pause / generic small */
+  .center{text-align:center}
+  .muted{color:rgba(244,231,207,.55)}
+  #fade{position:fixed;inset:0;background:#06040a;z-index:80;opacity:0;pointer-events:none;transition:opacity .6s}
+  #fade.show{opacity:1}
+  .hideCursor{cursor:none}
+  @media (max-width:560px){
+    #keys{display:none}
+    #objective{max-width:90%}
+  }
+
+  /* ---- touch / settings controls ---- */
+  #touchUI{position:fixed;z-index:26;right:12px;bottom:54px;display:none;flex-direction:column;gap:9px}
+  #touchUI.show{display:flex}
+  #touchUI .tb{width:48px;height:48px;border-radius:13px;background:rgba(12,9,18,.62);border:1px solid rgba(244,231,207,.28);
+    color:var(--dusk);font-size:21px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(3px);user-select:none}
+  #touchUI .tb:active,#touchUI .tb:hover{background:rgba(232,167,46,.22);border-color:var(--turmeric)}
+  #settings .panel{background:linear-gradient(180deg,#241a2e,#120c1a);border:1px solid rgba(232,167,46,.3);border-radius:16px;
+    padding:24px;width:min(330px,86vw);display:flex;flex-direction:column;gap:11px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  #settings h2{color:var(--dusk);text-align:center;margin-bottom:4px;letter-spacing:.04em}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="game" width="480" height="270"></canvas></div>
+
+<!-- HUD -->
+<div id="hud" class="day">
+  <div id="hudTop">
+    <div class="clockWrap">
+      <div id="clockOrb"></div>
+      <div id="clockText"><b id="dayLabel">Day 1</b><small id="phaseLabel">Morning Route</small></div>
+    </div>
+    <div id="stats"></div>
+  </div>
+  <div id="toast"></div>
+  <div id="interactPrompt">E · Deliver</div>
+  <div id="hudBottom">
+    <div id="objective"><div class="lbl">Route</div><div id="objText">Find the families on Babulal's old route.</div></div>
+    <div id="keys">
+      <span class="key"><b>WASD</b> Move</span>
+      <span class="key"><b>E</b> Talk</span>
+      <span class="key"><b>J</b> Journal</span>
+      <span class="key"><b>R</b> Rest</span>
+    </div>
+  </div>
+</div>
+
+<!-- Dialogue -->
+<div id="dlg">
+  <div id="dlgVoices"></div>
+  <div id="dlgBox">
+    <div class="speakerRow">
+      <canvas id="portrait" width="48" height="48"></canvas>
+      <div id="speaker"></div>
+    </div>
+    <div id="dlgText"></div>
+    <div id="choices"></div>
+    <div id="continueHint">Space / Click to continue ▸</div>
+  </div>
+</div>
+
+<!-- Journal -->
+<div id="journal">
+  <div class="jbook">
+    <div class="jhead"><h2>Route Journal</h2><button class="btn" style="padding:6px 14px" onclick="Journal.close()">Close ✕</button></div>
+    <div class="jtabs">
+      <button class="jtab active" data-tab="routes" onclick="Journal.tab('routes')">The Route</button>
+      <button class="jtab" data-tab="skills" onclick="Journal.tab('skills')">Inner Voices</button>
+    </div>
+    <div class="jbody" id="jbody"></div>
+  </div>
+</div>
+
+<!-- Cinematic -->
+<div id="cine">
+  <div id="cineArt"></div><div id="cineVeil"></div>
+  <div id="cineText"></div>
+  <div id="cineHint">Click / Space ▸</div>
+</div>
+
+<!-- Title -->
+<div id="title" class="overlay show">
+  <h1>The Tiffin Route</h1>
+  <div class="sub">A delivery between two worlds</div>
+  <div class="menu">
+    <button class="btn primary" id="btnNew" onclick="Game.newGame()">New Route</button>
+    <button class="btn" id="btnContinue" onclick="Game.continueGame()" disabled>Continue</button>
+    <button class="btn" id="btnAbout" onclick="Cine.about()">About</button>
+  </div>
+  <div class="credit">Pixel · narrative · India — single-file build</div>
+</div>
+
+<!-- touch controls + settings -->
+<div id="touchUI">
+  <div class="tb" id="tbSet" title="Settings">⚙</div>
+  <div class="tb" id="tbJournal" title="Journal (J)">☰</div>
+  <div class="tb" id="tbRest" title="Rest (R)">☾</div>
+</div>
+<div id="settings" class="overlay">
+  <div class="panel">
+    <h2>Paused</h2>
+    <button class="btn primary" id="btnResume">Resume</button>
+    <button class="btn" id="btnMute">Sound: On</button>
+    <button class="btn" id="btnTitle">Back to Title</button>
+  </div>
+</div>
+
+<div id="fade"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   THE TIFFIN ROUTE  —  self-contained web build
+   Data ported verbatim from npc_data.json / skill_voices.json
+   ============================================================ */
+const NPC_DATA = {
+  "mrs_mehta": {
+    "name": "Mrs. Mehta",
+    "title": "The Widow of Flat 4B",
+    "portrait_day": "res://assets/sprites/npcs/mrs_mehta_portrait.png",
+    "portrait_spirit": "res://assets/sprites/npcs/mrs_mehta_spirit_portrait.png",
+    "spawn_location_day": {"x": 180, "y": 95},
+    "spawn_location_night": {"x": 180, "y": 95},
+    "dialogue_trees": {
+
+      "first_meeting": {
+        "start": "m1_arrive",
+        "nodes": {
+          "m1_arrive": {
+            "speaker": "Mrs. Mehta",
+            "text": "Ah. You're early today. Your baba used to come at this time too.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "She called him 'your baba' — she knew your grandfather. The grief in her voice isn't about you.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "You knew my grandfather?", "stat_check": null, "next": "m1_knew_baba", "effects": {}},
+              {"id": "c1b", "text": "Sorry for the trouble. Here's your tiffin.", "stat_check": null, "next": "m1_just_tiffin", "effects": {}}
+            ]
+          },
+          "m1_knew_baba": {
+            "speaker": "Mrs. Mehta",
+            "text": "Forty years, your baba brought tiffin to this building. He knew everyone's order by heart. He knew my husband liked extra methi.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "Your husband — does he still live here?", "stat_check": null, "next": "m1_husband_question", "effects": {}}
+            ]
+          },
+          "m1_husband_question": {
+            "speaker": "Mrs. Mehta",
+            "text": "He did. Until three months ago.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Three months. The number people use when it's too new to say 'he passed away' casually but too old to still be crying openly.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c3a", "text": "I'm sorry. I didn't know.", "stat_check": null, "next": "m1_sorry", "effects": {"route_update": {"trust_level": 1}, "stat_modify": {"EMPATHY": 1}, "add_note": "Husband passed away 3 months ago. She knew Baba."}},
+              {"id": "c3b", "text": "[EMPATHY 2] She needs someone to sit with this, not rush past it.", "stat_check": {"skill": "EMPATHY", "threshold": 2}, "next": "m1_empathy_sit", "fail_next": "m1_sorry", "effects": {"route_update": {"trust_level": 1}, "stat_modify": {"EMPATHY": 1}, "add_note": "Husband passed away 3 months ago. She still sets out his plate."}}
+            ]
+          },
+          "m1_sorry": {
+            "speaker": "Mrs. Mehta",
+            "text": "No, no. How would you know? Come again tomorrow. I'll leave the container outside.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END",
+            "effects": {"route_update": {"day_state": 1}}
+          },
+          "m1_empathy_sit": {
+            "speaker": "Mrs. Mehta",
+            "text": "Some days I still put out two cups for tea. Muscle memory, you know? Thirty-two years.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "Thirty-two years of the same morning. She's not just grieving a person — she's grieving a whole shape of life.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c4a", "text": "That sounds... right, actually. To remember in your hands.", "stat_check": null, "next": "m1_empathy_end", "effects": {"route_update": {"day_state": 1, "trust_level": 1}, "stat_modify": {"GRIEF": 1}}}
+            ]
+          },
+          "m1_empathy_end": {
+            "speaker": "Mrs. Mehta",
+            "text": "Yes. Yes, exactly. Come again tomorrow, beta. I'll have the container ready.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "m1_just_tiffin": {
+            "speaker": "Mrs. Mehta",
+            "text": "No trouble. You're doing your family's work. That's a good thing.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END",
+            "effects": {"route_update": {"day_state": 1}}
+          }
+        }
+      },
+
+      "developing": {
+        "start": "m2_greeting",
+        "nodes": {
+          "m2_greeting": {
+            "speaker": "Mrs. Mehta",
+            "text": "I found some of his old photographs last night. I hadn't opened that box in years.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "Old paper and dried marigold. She's been going through his things.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "How was that?", "stat_check": null, "next": "m2_photos_hard", "effects": {}},
+              {"id": "c1b", "text": "[EMPATHY 2] Was there one that surprised you?", "stat_check": {"skill": "EMPATHY", "threshold": 2}, "next": "m2_photos_surprise", "fail_next": "m2_photos_hard", "effects": {}}
+            ]
+          },
+          "m2_photos_hard": {
+            "speaker": "Mrs. Mehta",
+            "text": "Hard. But also — he looked so young in them. I forgot he was ever that young.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "What was he like?", "stat_check": null, "next": "m2_husband_character", "effects": {}}
+            ]
+          },
+          "m2_photos_surprise": {
+            "speaker": "Mrs. Mehta",
+            "text": "There was one from before we were married. He's looking at the camera but his mind is somewhere else entirely. I never knew what he was thinking in that photograph. I never asked.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "The regret of the unanswered question. The thing you can no longer ask.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "That sounds like something he left behind for you to wonder about.", "stat_check": null, "next": "m2_husband_character", "effects": {"route_update": {"trust_level": 2}, "add_note": "She found an old photo — something in it she never understood. A question she can't ask anymore."}}
+            ]
+          },
+          "m2_husband_character": {
+            "speaker": "Mrs. Mehta",
+            "text": "He was stubborn. And quiet about the important things. Very quiet. I wonder now if there were things he never said.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "She's circling something. This isn't just reminiscing — she's carrying an unasked question.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c3a", "text": "Maybe he said them in other ways.", "stat_check": null, "next": "m2_end_warm", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}}},
+              {"id": "c3b", "text": "[GRIEF 1] Maybe some things are said in silences.", "stat_check": {"skill": "GRIEF", "threshold": 1}, "next": "m2_end_grief", "fail_next": "m2_end_warm", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}, "stat_modify": {"EMPATHY": 1}}}
+            ]
+          },
+          "m2_end_warm": {
+            "speaker": "Mrs. Mehta",
+            "text": "Maybe. Take the tiffin box back tomorrow when you come. I'll wash it tonight.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "m2_end_grief": {
+            "speaker": "Mrs. Mehta",
+            "text": "...Yes. I think you're right. Some things only make sense later, when you're listening differently.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "trust": {
+        "start": "m3_letter",
+        "nodes": {
+          "m3_letter": {
+            "speaker": "Mrs. Mehta",
+            "text": "I found a letter today. In his coat pocket — the one he wore to the hospital the last time. He never gave it to me.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "She's holding herself very still. This is the thing she's been building toward.", "requires_stat": 2},
+              {"skill": "GRIEF", "text": "The letter that didn't arrive. The words that never made the crossing.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "Have you read it?", "stat_check": null, "next": "m3_read_it", "effects": {}}
+            ]
+          },
+          "m3_read_it": {
+            "speaker": "Mrs. Mehta",
+            "text": "Not yet. I've been carrying it for three days. I don't know if I'm afraid he said something wonderful or something I can't bear to know.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "Either way, the letter will change things. She needs to know that's okay.", "requires_stat": 3}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Both things can be true at once.", "stat_check": null, "next": "m3_end", "effects": {}},
+              {"id": "c2b", "text": "[EMPATHY 3] Whatever it says — it's from him. That's what matters.", "stat_check": {"skill": "EMPATHY", "threshold": 3}, "next": "m3_end_empathy", "fail_next": "m3_end", "effects": {"route_update": {"trust_level": 3, "day_state": 3}, "add_note": "She found his unsent letter. She hasn't read it yet. Spirit world: the letter waits."}}
+            ]
+          },
+          "m3_end": {
+            "speaker": "Mrs. Mehta",
+            "text": "...I'll read it tonight. Come tomorrow.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END",
+            "effects": {"route_update": {"day_state": 3}}
+          },
+          "m3_end_empathy": {
+            "speaker": "Mrs. Mehta",
+            "text": "Yes. Yes. It's from him. Whatever he said — it was him saying it. That's enough.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END",
+            "effects": {"route_update": {"trust_level": 3, "day_state": 3}}
+          }
+        }
+      },
+
+      "spirit_not_ready": {
+        "start": "sn_1",
+        "nodes": {
+          "sn_1": {
+            "speaker": null,
+            "text": "A shape stands in the lantern light. She doesn't see you yet. Or perhaps she doesn't want to.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_intro": {
+        "start": "si_1",
+        "nodes": {
+          "si_1": {
+            "speaker": "NARRATOR",
+            "text": "The streets look the same, but the light falls differently here — gold through indigo, everything a little further away. She stands by the window of what used to be Flat 4B. She's holding something.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "You recognise this version of her. More transparent. The part that stays up when everything else has gone to sleep.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "Mrs. Mehta?", "stat_check": null, "next": "si_2", "effects": {}}
+            ]
+          },
+          "si_2": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "Oh. You're one of the ones who can see. Your grandfather could too, you know. He used to bring us what we needed without knowing it.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "What are you holding?", "stat_check": null, "next": "si_3", "effects": {"route_update": {"spirit_state": 1}}}
+            ]
+          },
+          "si_3": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "His letter. I've been holding it in both worlds. I still can't open it.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "She can't do it alone. That's why she's still here.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c3a", "text": "I can stay while you open it.", "stat_check": null, "next": "si_end", "effects": {}},
+              {"id": "c3b", "text": "[GRIEF 2] Some letters need a witness.", "stat_check": {"skill": "GRIEF", "threshold": 2}, "next": "si_end_grief", "fail_next": "si_end", "effects": {}}
+            ]
+          },
+          "si_end": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "Come again tomorrow night. I think I'll be ready then.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "si_end_grief": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "A witness. Yes. I never thought of it that way. Come back. Tomorrow night, I'll read it.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_resolution": {
+        "start": "sr_1",
+        "nodes": {
+          "sr_1": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "You came back. Good. I have the letter.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "She's not shaking anymore. She's decided.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "I'm here. Whenever you're ready.", "stat_check": null, "next": "sr_2", "effects": {}}
+            ]
+          },
+          "sr_2": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "'Rani — I know I am not good at saying these things while you can hear me. So I am saying it now in writing, which is easier for a coward like me. I loved the thirty-two years. Every single one. Don't be so quiet without me.'",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Oh. There it is. He knew. He just couldn't say it face to face.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "He wasn't quiet about the important things after all.", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "stat_modify": {"GRIEF": 1, "EMPATHY": 1}, "add_note": "Letter delivered. He loved the thirty-two years. She heard him, finally.", "set_flag": "mrs_mehta_resolved"}}
+            ]
+          },
+          "sr_end": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "No. He wasn't. He just needed someone to carry the words the last few steps. Thank you. Go now. I'm going to sleep.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_aftermath": {
+        "start": "sa_1",
+        "nodes": {
+          "sa_1": {
+            "speaker": "Mrs. Mehta",
+            "text": "She's standing in the light of the lanterns, and she looks — lighter. As if she set something down.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      }
+    }
+  },
+
+  "raju": {
+    "name": "Raju",
+    "title": "The Boy on the Temple Steps",
+    "portrait_day": "res://assets/sprites/npcs/raju_portrait.png",
+    "portrait_spirit": "res://assets/sprites/npcs/raju_spirit_portrait.png",
+    "spawn_location_day": {"x": 280, "y": 160},
+    "spawn_location_night": {"x": 280, "y": 160},
+    "dialogue_trees": {
+
+      "first_meeting": {
+        "start": "r1_caught",
+        "nodes": {
+          "r1_caught": {
+            "speaker": "Raju",
+            "text": "I didn't take anything. I was just... smelling it. The tiffin.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "He's lying. The tiffin on the bottom of the stack is lighter than it should be. One container is nearly empty.", "requires_stat": 1},
+              {"skill": "STREET_SENSE", "text": "Dirty sneakers, school bag, uniform three days unwashed. He's not homeless — he's run away.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "You're hungry. That's all right.", "stat_check": null, "next": "r1_generous", "effects": {"stat_modify": {"EMPATHY": 1}}},
+              {"id": "c1b", "text": "[NOSE 1] I can see the container is empty. Who taught you to eat so quietly?", "stat_check": {"skill": "NOSE", "threshold": 1}, "next": "r1_caught_gentle", "fail_next": "r1_generous", "effects": {}},
+              {"id": "c1c", "text": "That tiffin was for Flat 2A.", "stat_check": null, "next": "r1_strict", "effects": {}}
+            ]
+          },
+          "r1_generous": {
+            "speaker": "Raju",
+            "text": "I'll pay you back. I have money at home.",
+            "voice_interjections": [
+              {"skill": "STREET_SENSE", "text": "He said 'at home' not 'I don't have money.' He has a home. He just isn't in it.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Don't worry about it. I'll bring extra tomorrow.", "stat_check": null, "next": "r1_end_warm", "effects": {"route_update": {"day_state": 1, "trust_level": 1}, "add_note": "He's a runaway, not homeless. Has a home. Too proud to say more."}}
+            ]
+          },
+          "r1_caught_gentle": {
+            "speaker": "Raju",
+            "text": "...My ammi taught me. She said eating quietly was polite. I was trying to put it back before you noticed.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "Your ammi sounds like a careful person. I'll bring you your own tomorrow.", "stat_check": null, "next": "r1_end_warm", "effects": {"route_update": {"day_state": 1, "trust_level": 2}, "add_note": "His mother taught him to eat quietly. He's been here a few days."}}
+            ]
+          },
+          "r1_strict": {
+            "speaker": "Raju",
+            "text": "Sorry. Sorry, I'll go.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "Wait — are you all right?", "stat_check": null, "next": "r1_end_warm", "effects": {"route_update": {"day_state": 1}}}
+            ]
+          },
+          "r1_end_warm": {
+            "speaker": "Raju",
+            "text": "I'm fine. I'm just... between things right now.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "developing": {
+        "start": "r2_start",
+        "nodes": {
+          "r2_start": {
+            "speaker": "Raju",
+            "text": "You came back. With extra.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "I said I would. How long have you been sleeping here?", "stat_check": null, "next": "r2_how_long", "effects": {}}
+            ]
+          },
+          "r2_how_long": {
+            "speaker": "Raju",
+            "text": "Nine days. But I'm not sleeping here. I'm thinking.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "That distinction matters to him. He's not running — in his mind, he's making a decision.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Nine days is a long time to think.", "stat_check": null, "next": "r2_why_left", "effects": {}},
+              {"id": "c2b", "text": "[STREET_SENSE 2] What are you thinking about?", "stat_check": {"skill": "STREET_SENSE", "threshold": 2}, "next": "r2_why_left_direct", "fail_next": "r2_why_left", "effects": {}}
+            ]
+          },
+          "r2_why_left": {
+            "speaker": "Raju",
+            "text": "They sent me to this boarding school. To get a good future. But I was the only boy from here. Nobody talked to me like — like I was from anywhere.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Loneliness as a form of erasure. He left to find himself and ended up more lost.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c3a", "text": "So you left.", "stat_check": null, "next": "r2_end", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}, "add_note": "Ran from boarding school. Felt invisible, erased. Has a family waiting."}},
+              {"id": "c3b", "text": "[EMPATHY 2] And now nobody knows where you are.", "stat_check": {"skill": "EMPATHY", "threshold": 2}, "next": "r2_end_empathy", "fail_next": "r2_end", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}, "stat_modify": {"EMPATHY": 1}}}
+            ]
+          },
+          "r2_why_left_direct": {
+            "speaker": "Raju",
+            "text": "I'm thinking about whether going home means I lost. Or whether I was allowed to want to come home.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c3a", "text": "Wanting to go home doesn't make you a loser.", "stat_check": null, "next": "r2_end", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}, "add_note": "He thinks going home = admitting defeat. Pride vs longing."}}
+            ]
+          },
+          "r2_end": {
+            "speaker": "Raju",
+            "text": "...Yeah. I left. I don't know if I want to go back.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "r2_end_empathy": {
+            "speaker": "Raju",
+            "text": "My ammi doesn't know. My baba will be so angry. He saved for two years for that school.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "trust": {
+        "start": "r3_phone",
+        "nodes": {
+          "r3_phone": {
+            "speaker": "Raju",
+            "text": "I borrowed a phone from the chai man. To call home. I stood there for four minutes and then I gave it back.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He dialled and couldn't do it. The pride and the longing are equally strong.", "requires_stat": 2},
+              {"skill": "GRIEF", "text": "Four minutes is a long time to hold a phone and decide not to speak.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "What stopped you?", "stat_check": null, "next": "r3_stopped", "effects": {}}
+            ]
+          },
+          "r3_stopped": {
+            "speaker": "Raju",
+            "text": "I didn't know what to say after 'hello.' Everything after 'hello' would have to be an explanation.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "'Hello' might be enough.", "stat_check": null, "next": "r3_end", "effects": {"route_update": {"trust_level": 2, "day_state": 3}}},
+              {"id": "c2b", "text": "[STREET_SENSE 2] They already know you're coming home. They're just waiting for the call.", "stat_check": {"skill": "STREET_SENSE", "threshold": 2}, "next": "r3_end_sense", "fail_next": "r3_end", "effects": {"route_update": {"trust_level": 3, "day_state": 3}, "add_note": "He needs courage to call. The words 'hello' are the whole door."}}
+            ]
+          },
+          "r3_end": {
+            "speaker": "Raju",
+            "text": "Maybe. I'll think about it.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "r3_end_sense": {
+            "speaker": "Raju",
+            "text": "How do you know that?",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c3a", "text": "Because you're their son. You could call ten years later and they'd pick up.", "stat_check": null, "next": "r3_end_final", "effects": {}}
+            ]
+          },
+          "r3_end_final": {
+            "speaker": "Raju",
+            "text": "...",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He's crying. Very quietly. Like someone who was taught to eat quietly.", "requires_stat": 2}
+            ],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_not_ready": {
+        "start": "sn_1",
+        "nodes": {
+          "sn_1": {
+            "speaker": null,
+            "text": "A small shape sits on the spirit-steps. He's holding something small and luminous — you can't tell what it is yet.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_intro": {
+        "start": "si_1",
+        "nodes": {
+          "si_1": {
+            "speaker": "Spirit — Raju",
+            "text": "You can see me here too. I wondered if you would.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "What are you holding?", "stat_check": null, "next": "si_2", "effects": {"route_update": {"spirit_state": 1}}}
+            ]
+          },
+          "si_2": {
+            "speaker": "Spirit — Raju",
+            "text": "A phone. But here it doesn't ring. I've been carrying the call I didn't make.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "The unmade call is heavier than any call you make. It lives in the gap.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Can I deliver it for you?", "stat_check": null, "next": "si_end", "effects": {}}
+            ]
+          },
+          "si_end": {
+            "speaker": "Spirit — Raju",
+            "text": "You can't call for me. But maybe you can show me how it goes. Come back tomorrow.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_resolution": {
+        "start": "sr_1",
+        "nodes": {
+          "sr_1": {
+            "speaker": "Spirit — Raju",
+            "text": "I'm ready to call. I just need — I need to hear myself do it. Can you be here?",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "I'm here. Say 'hello.'", "stat_check": null, "next": "sr_2", "effects": {}}
+            ]
+          },
+          "sr_2": {
+            "speaker": "Spirit — Raju",
+            "text": "...Hello? Ammi? It's me. ...Yes. Yes, I know. I'm coming home.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "There it is. The whole weight of nine days in four words.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "(Say nothing. Let him have this.)", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flag": "raju_resolved", "add_note": "He made the call. He's going home.", "stat_modify": {"EMPATHY": 1}}}
+            ]
+          },
+          "sr_end": {
+            "speaker": "Spirit — Raju",
+            "text": "The phone vanished. I think — I think it worked. Go. I'm going to go find a real phone now.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_aftermath": {
+        "start": "sa_1",
+        "nodes": {
+          "sa_1": {
+            "speaker": null,
+            "text": "The steps are empty. He's gone home.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      }
+    }
+  },
+
+  "desai": {
+    "name": "Desai Sahib",
+    "title": "The Clerk at Window 3",
+    "portrait_day": "res://assets/sprites/npcs/desai_portrait.png",
+    "portrait_spirit": "res://assets/sprites/npcs/desai_spirit_portrait.png",
+    "spawn_location_day": {"x": 380, "y": 120},
+    "spawn_location_night": {"x": 380, "y": 120},
+    "dialogue_trees": {
+
+      "first_meeting": {
+        "start": "d1_start",
+        "nodes": {
+          "d1_start": {
+            "speaker": "Desai Sahib",
+            "text": "New delivery person, hah? Your parking permit is not valid for this lane. I can overlook it... for a consideration.",
+            "voice_interjections": [
+              {"skill": "STREET_SENSE", "text": "Standard shakedown. But his hands are shaking too. The villain in this scene is tired.", "requires_stat": 1},
+              {"skill": "NOSE", "text": "Hospital disinfectant under the sweat. He came from somewhere before work.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "How much of a consideration?", "stat_check": null, "next": "d1_bribe", "effects": {}},
+              {"id": "c1b", "text": "[NOSE 2] You smell like Nair Hospital. Long morning?", "stat_check": {"skill": "NOSE", "threshold": 2}, "next": "d1_hospital", "fail_next": "d1_bribe", "effects": {}},
+              {"id": "c1c", "text": "I'll move the bicycle.", "stat_check": null, "next": "d1_leave", "effects": {}}
+            ]
+          },
+          "d1_bribe": {
+            "speaker": "Desai Sahib",
+            "text": "One hundred rupees. And you can come and go freely.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "(Pay it. It's easier.)", "stat_check": null, "next": "d1_paid", "effects": {"route_update": {"day_state": 1}, "add_note": "Took a small bribe. Tired, not cruel."}},
+              {"id": "c2b", "text": "I don't have it today. I'll bring it tomorrow.", "stat_check": null, "next": "d1_defer", "effects": {"route_update": {"day_state": 1}}}
+            ]
+          },
+          "d1_hospital": {
+            "speaker": "Desai Sahib",
+            "text": "...What? I don't— yes. I had an appointment. Never mind that.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He flinched. That question landed somewhere real.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "I hope it was a good appointment.", "stat_check": null, "next": "d1_hospital_soft", "effects": {"route_update": {"day_state": 1, "trust_level": 1, "unlocked": true}, "add_note": "Goes to Nair Hospital. Won't say why. The extortion softened when I mentioned it."}}
+            ]
+          },
+          "d1_hospital_soft": {
+            "speaker": "Desai Sahib",
+            "text": "...Move your bicycle out of Window 3's eyeline. Window 4 is fine. Go.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "d1_paid": {
+            "speaker": "Desai Sahib",
+            "text": "Tomorrow, same time, it lapses. Good day.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "d1_defer": {
+            "speaker": "Desai Sahib",
+            "text": "Tomorrow then. Don't make me come looking.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "d1_leave": {
+            "speaker": "Desai Sahib",
+            "text": "Good. See you don't forget.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END",
+            "effects": {"route_update": {"day_state": 1}}
+          }
+        }
+      },
+
+      "developing": {
+        "start": "d2_start",
+        "nodes": {
+          "d2_start": {
+            "speaker": "Desai Sahib",
+            "text": "You again. You're consistent. I'll give you that.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "Hospital again. More than an appointment. This is routine.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "I brought you your tiffin. New route — you're on the list now.", "stat_check": null, "next": "d2_tiffin", "effects": {}},
+              {"id": "c1b", "text": "[NOSE 2] Nair Hospital again today?", "stat_check": {"skill": "NOSE", "threshold": 2}, "next": "d2_hospital_again", "fail_next": "d2_tiffin", "effects": {}}
+            ]
+          },
+          "d2_tiffin": {
+            "speaker": "Desai Sahib",
+            "text": "I didn't ask to be on a list.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "I know. It's a gift. First one's free.", "stat_check": null, "next": "d2_end_tiffin", "effects": {"route_update": {"day_state": 2, "trust_level": 1}}}
+            ]
+          },
+          "d2_hospital_again": {
+            "speaker": "Desai Sahib",
+            "text": "My wife. She's been — she has her treatments on Tuesdays and Fridays.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He said it quietly. The way people say things they've had to say too many times to cry over anymore.", "requires_stat": 2},
+              {"skill": "GRIEF", "text": "He's not angry with you. He's angry with something much larger and taking it out on people at his eye level.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "I'm sorry. That's a hard schedule to carry.", "stat_check": null, "next": "d2_wife_reveal", "effects": {"route_update": {"day_state": 2, "trust_level": 2, "spirit_unlocked": true}, "add_note": "Wife is ill. Treatments Tuesdays and Fridays at Nair Hospital. The bribes are funding it."}}
+            ]
+          },
+          "d2_wife_reveal": {
+            "speaker": "Desai Sahib",
+            "text": "It is what it is. Don't — don't tell anyone. This is not your business.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "It won't leave this lane.", "stat_check": null, "next": "d2_end_trust", "effects": {}}
+            ]
+          },
+          "d2_end_trust": {
+            "speaker": "Desai Sahib",
+            "text": "...Leave the tiffin. And come from Window 4 side tomorrow. I'll tell them you're expected.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "d2_end_tiffin": {
+            "speaker": "Desai Sahib",
+            "text": "...Fine. First one. Leave it.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "trust": {
+        "start": "d3_confession",
+        "nodes": {
+          "d3_confession": {
+            "speaker": "Desai Sahib",
+            "text": "I've been thinking. What I take from the department — for her treatments. I know what it is. I've known for two years.",
+            "voice_interjections": [
+              {"skill": "STREET_SENSE", "text": "He didn't just decide to confess. He needed someone who already knew the right amount — not everything, enough.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "Why are you telling me this?", "stat_check": null, "next": "d3_why", "effects": {}}
+            ]
+          },
+          "d3_why": {
+            "speaker": "Desai Sahib",
+            "text": "Because you're the only person who brings me food and doesn't want something from me. That's — that means something, strangely.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "Is there another way to fund the treatments?", "stat_check": null, "next": "d3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "add_note": "He confessed the source of the bribes. Wife's medical costs. Wants a way out."}},
+              {"id": "c2b", "text": "[EMPATHY 3] You've been alone with this for two years.", "stat_check": {"skill": "EMPATHY", "threshold": 3}, "next": "d3_end_empathy", "fail_next": "d3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "stat_modify": {"EMPATHY": 1}}}
+            ]
+          },
+          "d3_end": {
+            "speaker": "Desai Sahib",
+            "text": "I'm looking into it. There are government schemes I should have applied for. I was too — too proud. Or too frightened.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "d3_end_empathy": {
+            "speaker": "Desai Sahib",
+            "text": "Two years, four months, and eleven days. I counted.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_not_ready": {
+        "start": "sn_1",
+        "nodes": {
+          "sn_1": {
+            "speaker": null,
+            "text": "A figure in a government uniform stands very still. He's surrounded by floating papers. They won't stop moving.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_intro": {
+        "start": "si_1",
+        "nodes": {
+          "si_1": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "The papers won't stop. Every one of them is a form I filled wrong. Or filled right for the wrong reason.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "What would make them stop?", "stat_check": null, "next": "si_2", "effects": {"route_update": {"spirit_state": 1}}}
+            ]
+          },
+          "si_2": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "I don't know. The form I actually need to fill — the right one — I can never find it.",
+            "voice_interjections": [
+              {"skill": "STREET_SENSE", "text": "He's looking for a legitimate path. One he should have taken. That's what he needs delivered.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Maybe I can find it for you.", "stat_check": null, "next": "si_end", "effects": {}}
+            ]
+          },
+          "si_end": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "You would do that. Come back.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_resolution": {
+        "start": "sr_1",
+        "nodes": {
+          "sr_1": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "You found it?",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "PM-JAY. National health scheme. She qualifies. You qualify. You always did.", "stat_check": null, "next": "sr_2", "effects": {}}
+            ]
+          },
+          "sr_2": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "...I knew about PM-JAY. I never applied because applying meant I was admitting I couldn't afford it myself.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Pride as its own kind of poverty. He couldn't bear the paperwork of needing help.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Applying means you love her more than you need to seem fine.", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flag": "desai_resolved", "add_note": "Spirit delivered: the form he never filled. PM-JAY. He needed permission to need help.", "stat_modify": {"GRIEF": 1}}}
+            ]
+          },
+          "sr_end": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "The papers have stopped. ...I'll fill it in the morning. The real one.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_aftermath": {
+        "start": "sa_1",
+        "nodes": {
+          "sa_1": {
+            "speaker": null,
+            "text": "The papers are gone. He's standing in clear air for the first time in what must feel like years.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      }
+    }
+  },
+
+  "arjun": {
+    "name": "Arjun",
+    "title": "The Son Who Came Back",
+    "portrait_day": "res://assets/sprites/npcs/arjun_portrait.png",
+    "portrait_spirit": "res://assets/sprites/npcs/arjun_spirit_portrait.png",
+    "spawn_location_day": {"x": 100, "y": 180},
+    "spawn_location_night": {"x": 100, "y": 180},
+    "dialogue_trees": {
+
+      "first_meeting": {
+        "start": "a1_new",
+        "nodes": {
+          "a1_new": {
+            "speaker": "Arjun",
+            "text": "New address. I just moved back. My father lives here — I'll be staying for a while.",
+            "voice_interjections": [
+              {"skill": "STREET_SENSE", "text": "New to this address, but not new to this city. He knows how to stand on these streets. He grew up here.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "Welcome back. Two portions?", "stat_check": null, "next": "a1_two_portions", "effects": {}},
+              {"id": "c1b", "text": "How long have you been away?", "stat_check": null, "next": "a1_away", "effects": {}}
+            ]
+          },
+          "a1_two_portions": {
+            "speaker": "Arjun",
+            "text": "One. He doesn't eat much. And I'm not sure he'll eat at all if I'm the one who ordered it.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "Something happened between them. He came back anyway. That means something.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "I'll bring two anyway. He might surprise you.", "stat_check": null, "next": "a1_end", "effects": {"route_update": {"day_state": 1, "trust_level": 1, "unlocked": true}, "add_note": "Returned from abroad. Complicated relationship with his father. Father may not accept food."}}
+            ]
+          },
+          "a1_away": {
+            "speaker": "Arjun",
+            "text": "Eight years. I was in Canada. I came back when my father's health started — well. I came back.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "He stopped himself from finishing that sentence. Whatever he came back for, it's complicated by grief.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "That's a long time. And a long way.", "stat_check": null, "next": "a1_end", "effects": {"route_update": {"day_state": 1, "unlocked": true}}}
+            ]
+          },
+          "a1_end": {
+            "speaker": "Arjun",
+            "text": "Yes. Well. Leave the tiffin at the door. We'll... sort it out.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "developing": {
+        "start": "a2_start",
+        "nodes": {
+          "a2_start": {
+            "speaker": "Arjun",
+            "text": "He ate from the tiffin. He didn't say anything about it. But he ate.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "The container you're collecting smells of the same sabzi you've been sending. He ate exactly his portion and no more. Neither wasteful nor reaching for seconds — the discipline of a man sitting with his pride.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "That's something.", "stat_check": null, "next": "a2_that_something", "effects": {}}
+            ]
+          },
+          "a2_that_something": {
+            "speaker": "Arjun",
+            "text": "My mother used to say that with him. 'It's something. Take it.' She was very good at reading the space between what he said and what he meant.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Past tense. She's gone.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Your mother — she passed?", "stat_check": null, "next": "a2_mother", "effects": {}}
+            ]
+          },
+          "a2_mother": {
+            "speaker": "Arjun",
+            "text": "Six years ago. I didn't come back for the funeral. I told myself I couldn't afford the flight. That was — it wasn't true.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He's carrying this like a stone he can't put down.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Does your father know you wanted to come?", "stat_check": null, "next": "a2_father_knows", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}, "add_note": "Wasn't at mother's funeral 6 years ago. His reason was a lie. Father doesn't know he wanted to come."}},
+              {"id": "c2b", "text": "[GRIEF 1] That kind of regret doesn't have a name in English.", "stat_check": {"skill": "GRIEF", "threshold": 1}, "next": "a2_grief_response", "fail_next": "a2_father_knows", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}}}
+            ]
+          },
+          "a2_father_knows": {
+            "speaker": "Arjun",
+            "text": "No. He thinks I didn't care. I've let him think that for six years.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "a2_grief_response": {
+            "speaker": "Arjun",
+            "text": "No. In Hindi either. I've looked.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "trust": {
+        "start": "a3_start",
+        "nodes": {
+          "a3_start": {
+            "speaker": "Arjun",
+            "text": "I tried to talk to him last night. About Amma. He left the room.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "He's not ready yet?", "stat_check": null, "next": "a3_ready", "effects": {}},
+              {"id": "c1b", "text": "[EMPATHY 2] Or maybe he's too ready — he's been sitting with it alone for six years.", "stat_check": {"skill": "EMPATHY", "threshold": 2}, "next": "a3_empathy", "fail_next": "a3_ready", "effects": {}}
+            ]
+          },
+          "a3_ready": {
+            "speaker": "Arjun",
+            "text": "Maybe. Or maybe I said it wrong. I don't know how to talk to him anymore. I forgot the language, somehow.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "Maybe the language was always actions, not words.", "stat_check": null, "next": "a3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 2}}}
+            ]
+          },
+          "a3_empathy": {
+            "speaker": "Arjun",
+            "text": "...Both of us have been sitting alone with it. That's — I hadn't thought of it that way. He lost her too.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "The door between you is the same door. Just approach from the other side.", "stat_check": null, "next": "a3_end_empathy", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "add_note": "The door is the same door — father and son both standing at opposite sides."}}
+            ]
+          },
+          "a3_end": {
+            "speaker": "Arjun",
+            "text": "He used to come fix things in my room without asking. I hated it. Now I'd give anything to hear him puttering around.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "a3_end_empathy": {
+            "speaker": "Arjun",
+            "text": "The same door. ...I'll try again tonight.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_not_ready": {
+        "start": "sn_1",
+        "nodes": {
+          "sn_1": {
+            "speaker": null,
+            "text": "A figure stands before a door that won't open. He's been knocking for a long time.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_intro": {
+        "start": "si_1",
+        "nodes": {
+          "si_1": {
+            "speaker": "Spirit — Arjun",
+            "text": "I've been standing here for six years. The door looks like our house. But it won't open.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "What would open it?", "stat_check": null, "next": "si_2", "effects": {"route_update": {"spirit_state": 1}}}
+            ]
+          },
+          "si_2": {
+            "speaker": "Spirit — Arjun",
+            "text": "Saying the thing I never said. But I can't say it until he hears it.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He needs the door to open from the inside. Someone on the other side has to be listening.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Say it to me. I'll carry it to him.", "stat_check": null, "next": "si_end", "effects": {}}
+            ]
+          },
+          "si_end": {
+            "speaker": "Spirit — Arjun",
+            "text": "Come back. I need a little more time to find the words.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_resolution": {
+        "start": "sr_1",
+        "nodes": {
+          "sr_1": {
+            "speaker": "Spirit — Arjun",
+            "text": "I found the words. I want to say them and I want you to deliver them.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "I'm ready.", "stat_check": null, "next": "sr_2", "effects": {}}
+            ]
+          },
+          "sr_2": {
+            "speaker": "Spirit — Arjun",
+            "text": "Tell him: I was a coward, Pitaji. I was afraid you'd see how sorry I was. I came back because I'm done being afraid of you seeing me.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "The truth that was too heavy to carry alone. Now it has wheels.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "(Carry the words to Pitaji's door in the spirit-world.)", "stat_check": null, "next": "sr_3", "effects": {}}
+            ]
+          },
+          "sr_3": {
+            "speaker": "NARRATOR",
+            "text": "You walk to the other side of the door. On this side, an old man in the spirit-city. He heard. He was always on the other side, also waiting.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c3a", "text": "(The door opens.)", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flag": "arjun_resolved", "add_note": "The door opened. Both men were waiting on opposite sides.", "stat_modify": {"GRIEF": 1, "EMPATHY": 1}}}
+            ]
+          },
+          "sr_end": {
+            "speaker": "Spirit — Arjun",
+            "text": "Oh. ...Oh. He was right there.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_aftermath": {
+        "start": "sa_1",
+        "nodes": {
+          "sa_1": {
+            "speaker": null,
+            "text": "The door stands open. Both of them are inside.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      }
+    }
+  },
+
+  "champa": {
+    "name": "Champa Tai",
+    "title": "The Tea Stall at the Corner",
+    "portrait_day": "res://assets/sprites/npcs/champa_portrait.png",
+    "portrait_spirit": "res://assets/sprites/npcs/champa_spirit_portrait.png",
+    "spawn_location_day": {"x": 340, "y": 200},
+    "spawn_location_night": {"x": 340, "y": 200},
+    "dialogue_trees": {
+
+      "first_meeting": {
+        "start": "c1_intro",
+        "nodes": {
+          "c1_intro": {
+            "speaker": "Champa Tai",
+            "text": "Arre, you're Babulal's grandchild! You look just like him. Sit, sit — have chai first, tiffin second.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "Cardamom, ginger, and two types of tea leaf. She doesn't cut corners. This stall has standards.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "You knew my grandfather?", "stat_check": null, "next": "c1_grandpa", "effects": {}},
+              {"id": "c1b", "text": "I shouldn't stop — I have deliveries.", "stat_check": null, "next": "c1_busy", "effects": {}}
+            ]
+          },
+          "c1_grandpa": {
+            "speaker": "Champa Tai",
+            "text": "Twenty-five years I've had this stall. He stopped here every morning. Never took sugar. Said it confused the taste.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "That sounds like him.", "stat_check": null, "next": "c1_end_warm", "effects": {"route_update": {"day_state": 1, "trust_level": 1}, "add_note": "25 years at this stall. Knew Baba well. He took chai without sugar."}}
+            ]
+          },
+          "c1_busy": {
+            "speaker": "Champa Tai",
+            "text": "Five minutes. The chai is already poured. Your grandfather never said no to chai.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "(Sit down.)", "stat_check": null, "next": "c1_end_warm", "effects": {"route_update": {"day_state": 1, "trust_level": 1}}}
+            ]
+          },
+          "c1_end_warm": {
+            "speaker": "Champa Tai",
+            "text": "Come every day. I know everyone's business and I'll tell you none of it. But I'll give you the right chai for whatever mood you're in.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "developing": {
+        "start": "c2_homesick",
+        "nodes": {
+          "c2_homesick": {
+            "speaker": "Champa Tai",
+            "text": "Baba — sorry, I keep calling you that — something in your chai today? It tastes different to me.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "She's not talking about the chai. Something in her mood changed the flavour of the whole interaction.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "It tastes the same to me. Why different to you?", "stat_check": null, "next": "c2_why_diff", "effects": {}},
+              {"id": "c1b", "text": "[NOSE 2] It's not the chai. What's different today?", "stat_check": {"skill": "NOSE", "threshold": 2}, "next": "c2_nose_direct", "fail_next": "c2_why_diff", "effects": {}}
+            ]
+          },
+          "c2_why_diff": {
+            "speaker": "Champa Tai",
+            "text": "My sister called from the village this morning. My mother's mango tree finally died. It was forty years old.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Forty years. The tree she grew up with. The one whose shade held her whole childhood.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Did you plant it?", "stat_check": null, "next": "c2_tree", "effects": {}}
+            ]
+          },
+          "c2_nose_direct": {
+            "speaker": "Champa Tai",
+            "text": "Ayo, clever one. My mother's mango tree. Forty years. Gone this morning.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "Forty years is a long life for a tree.", "stat_check": null, "next": "c2_tree", "effects": {}}
+            ]
+          },
+          "c2_tree": {
+            "speaker": "Champa Tai",
+            "text": "My father planted it the year I was born. I climbed it every summer. The last time I was home was fourteen years ago.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "The tree is a calendar of everything she hasn't gone back to.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c3a", "text": "Do you miss home?", "stat_check": null, "next": "c2_miss_home", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}, "add_note": "Hasn't been home in 14 years. Mother's mango tree died. Her village is a ghost she carries."}}
+            ]
+          },
+          "c2_miss_home": {
+            "speaker": "Champa Tai",
+            "text": "I made this city my home. That was the deal I made with myself when I came at twenty-two. But sometimes... sometimes the old home doesn't care about your deal.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "trust": {
+        "start": "c3_train",
+        "nodes": {
+          "c3_train": {
+            "speaker": "Champa Tai",
+            "text": "I bought a train ticket last week. To go home. I've been carrying it in my apron every day. I haven't booked the time off.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "The ticket is a promise she made to herself. The time-off is the part that makes it real.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "What's stopping you from booking it?", "stat_check": null, "next": "c3_fear", "effects": {}}
+            ]
+          },
+          "c3_fear": {
+            "speaker": "Champa Tai",
+            "text": "If I go home, I might not want to come back. And this stall — these people — this is also my home now. I don't know how to hold both.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "The terror of the divided self. She belongs to both places and fully to neither.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "You won't have to choose. Both can be real.", "stat_check": null, "next": "c3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "add_note": "Holding a train ticket. Afraid that going home means leaving here. Needs permission to hold both."}},
+              {"id": "c2b", "text": "[EMPATHY 2] This place became home because of what you put into it. That won't disappear if you leave for two weeks.", "stat_check": {"skill": "EMPATHY", "threshold": 2}, "next": "c3_end_empathy", "fail_next": "c3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "stat_modify": {"EMPATHY": 1}}}
+            ]
+          },
+          "c3_end": {
+            "speaker": "Champa Tai",
+            "text": "Both can be real. I'll think about that.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "c3_end_empathy": {
+            "speaker": "Champa Tai",
+            "text": "Twenty-five years I've been here. The regulars know my schedule. The stall knows my hands. You're right — it won't forget me in two weeks.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_not_ready": {
+        "start": "sn_1",
+        "nodes": {
+          "sn_1": {
+            "speaker": null,
+            "text": "The tea stall glows in the lantern-light. A woman stands between two directions, as if she can't remember which way she's facing.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_intro": {
+        "start": "si_1",
+        "nodes": {
+          "si_1": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "Ah. The delivery boy who sees. Sit. I don't have real chai here but sit anyway.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "You're between two places here too.", "stat_check": null, "next": "si_2", "effects": {"route_update": {"spirit_state": 1}}}
+            ]
+          },
+          "si_2": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "I'm always between two places. Here in this city-dream, I can see both at once. The mango tree. This stall corner. They're the same distance.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "She's closer to peace than she thinks. She just needs someone to witness the distance and say it's okay.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "What do you need delivered?", "stat_check": null, "next": "si_end", "effects": {}}
+            ]
+          },
+          "si_end": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "Permission. I need someone to tell me I'm allowed to be from two places. Come back, beta.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_resolution": {
+        "start": "sr_1",
+        "nodes": {
+          "sr_1": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "You came back. You have it?",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "You are allowed to be from two places. Both are real. Both are yours.", "stat_check": null, "next": "sr_2", "effects": {}}
+            ]
+          },
+          "sr_2": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "Both are mine. ...Yes. Yes, that's right. The mango tree is dead but I remember it and that means it's still mine. And this corner is mine. And I can go home and come back and it will all still be mine.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Grief that finds its shape. Not an ending — a belonging that spans distance.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Go home, Champa Tai. We'll hold the stall.", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flag": "champa_resolved", "add_note": "Delivered permission to belong to both places. She's going home.", "stat_modify": {"GRIEF": 1}}}
+            ]
+          },
+          "sr_end": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "Ha! You have no idea how to run a stall. But yes. I'm going. I'll bring back good mangoes.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_aftermath": {
+        "start": "sa_1",
+        "nodes": {
+          "sa_1": {
+            "speaker": null,
+            "text": "The stall is still there, glowing warmly. A handwritten note: 'Back in two weeks. Kettle is on the left.'",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      }
+    }
+  }
+};
+const SKILL_VOICES = {
+  "EMPATHY": [
+    "Something in her posture — she's been holding herself together for a long time.",
+    "He's not angry. He's frightened.",
+    "There's a grief here that hasn't been spoken aloud yet.",
+    "You can feel it, the way a cold room feels — the absence of someone.",
+    "She doesn't want you to leave. She just doesn't know how to ask you to stay."
+  ],
+  "NOSE": [
+    "The rice smells overcooked. She wasn't paying attention when she made it.",
+    "There's something under the cardamom and cumin — something sour. Guilt, maybe.",
+    "Old cigarette smoke on his collar. He told you he quit.",
+    "The tiffin came back half-eaten. That hasn't happened in weeks. Something changed.",
+    "You can smell the ghee from the stairwell. She cooked today. That's new."
+  ],
+  "STEADY_HANDS": [
+    "Don't rush. A wobbling stack draws eyes you don't want.",
+    "You've navigated this alley a hundred times. The body knows even when the mind doesn't.",
+    "Hold it level. Some things only stay intact if you treat them gently.",
+    "This conversation needs the same care as a full tiffin on a crowded bus. Slow. Deliberate."
+  ],
+  "STREET_SENSE": [
+    "The chai stall shutters at 6. If he's still standing there, he's waiting for something that isn't chai.",
+    "Two men watching from the shade. They're not regulars. File that away.",
+    "She took a different staircase. She didn't want to be seen going up.",
+    "The gully goes quiet this time of day. Good time to talk.",
+    "He's lying, but not about the big thing. About something smaller that protects the big thing."
+  ],
+  "GRIEF": [
+    "You recognize that particular stillness. It's the stillness of someone who has stopped expecting things to get better.",
+    "There's a shape to this sadness — it isn't fresh. It's been worn smooth.",
+    "She counts her days in what she used to do with him. Today is a 'we used to go to the market on Tuesdays' kind of day.",
+    "He hasn't cried yet. That's the dangerous part.",
+    "The loss didn't happen all at once. It's still happening. Every day, a little more."
+  ]
+};
+
+/* ---------- constants ---------- */
+const VW=480, VH=270, TILE=16;
+const SKILLS=["EMPATHY","NOSE","STEADY_HANDS","STREET_SENSE","GRIEF"];
+const SKILL_COLOR={EMPATHY:"#e88fb0",NOSE:"#e8c34a",STEADY_HANDS:"#7fc6c0",STREET_SENSE:"#9a8fe8",GRIEF:"#8fa6ff"};
+const SKILL_SHORT={EMPATHY:"EMP",NOSE:"NOSE",STEADY_HANDS:"HANDS",STREET_SENSE:"STREET",GRIEF:"GRIEF"};
+const SKILL_DESC={
+  EMPATHY:"Reads the feeling under the words. The grief people carry without naming it.",
+  NOSE:"Your grandfather's gift. Smells the truth in a kitchen, a collar, a half-eaten tiffin.",
+  STEADY_HANDS:"The body's wisdom. A stack held level; a conversation handled gently.",
+  STREET_SENSE:"The logic of the gully. Who's waiting, who's lying, who's about to run.",
+  GRIEF:"You know this weather. It lets you sit with sorrow without flinching."
+};
+const ORDER=["mrs_mehta","raju","desai","arjun","champa"];
+
+/* ---- real Higgsfield pixel-art portraits (loaded from CDN; procedural fallback if offline) ---- */
+const ART_BASE="https://d8j0ntlcm91z4.cloudfront.net/user_3F63nkWT7V1yAkun8oivzNQun6a/";
+const KEYART="https://d8j0ntlcm91z4.cloudfront.net/user_3F63nkWT7V1yAkun8oivzNQun6a/hf_20260614_001805_706e338d-6ede-4349-8044-5fac74291970.png";
+const PORTRAIT_URLS={
+  mrs_mehta:{day:ART_BASE+"hf_20260614_172200_7a00d567-603e-4fdf-b401-8d0c8645de5f.png", spirit:ART_BASE+"hf_20260614_172801_7ea5f112-8ce0-4e54-8a79-d7c18e9351ff.png"},
+  raju:{day:ART_BASE+"hf_20260614_172204_803fe9b3-9e30-4ba3-ab65-02ccddb35a91.png", spirit:ART_BASE+"hf_20260614_172803_dcf56832-a81d-4752-b9a3-382f254ddf2b.png"},
+  desai:{day:ART_BASE+"hf_20260614_172748_982b9fe8-e5f9-4a5b-8f44-a5e3eca57653.png", spirit:ART_BASE+"hf_20260614_172806_8d545164-ab97-4fd8-9ba2-078e6c5f3c84.png"},
+  arjun:{day:ART_BASE+"hf_20260614_172751_89d24867-5a7b-4dad-86ce-10bc21db939b.png", spirit:ART_BASE+"hf_20260614_172809_af14beb5-d935-4c9f-8d70-1d6932a5bed5.png"},
+  champa:{day:ART_BASE+"hf_20260614_172755_9a8c9cb4-dd0b-418e-a98f-4dd8872668c5.png", spirit:ART_BASE+"hf_20260614_172811_3be3927e-5f4e-4af8-936a-eb5dc0c598a5.png"},
+  player:{day:ART_BASE+"hf_20260614_172155_af537665-2109-4fd3-add0-173e8d1c2577.png", spirit:ART_BASE+"hf_20260614_172759_e6dacfa3-f127-4aac-80ee-4cdf30075285.png"}
+};
+const _imgCache={};
+function loadImg(url){ if(_imgCache[url])return _imgCache[url];
+  const rec={img:new Image(),ok:false,err:false}; _imgCache[url]=rec;
+  rec.img.onload=()=>{rec.ok=true;}; rec.img.onerror=()=>{rec.err=true;}; rec.img.src=url; return rec; }
+function paintPortrait(canvas,id,spirit){
+  const c=canvas.getContext("2d");
+  drawPortrait(c,LOOK[id],spirit);                 // instant procedural base + offline fallback
+  const set=PORTRAIT_URLS[id]; if(!set)return;
+  const rec=loadImg(spirit?set.spirit:set.day);
+  const blit=()=>{ if(!rec.img.width)return; const W=canvas.width,H=canvas.height;
+    const smin=Math.min(rec.img.width,rec.img.height), sx=(rec.img.width-smin)/2, sy=(rec.img.height-smin)/2;
+    c.imageSmoothingEnabled=false; c.clearRect(0,0,W,H); c.drawImage(rec.img,sx,sy,smin,smin,0,0,W,H); };
+  if(rec.ok) blit(); else if(!rec.err) rec.img.addEventListener("load",blit,{once:true});
+}
+
+/* per-NPC visual identity (procedural pixel portraits + world sprites) */
+const LOOK={
+  mrs_mehta:{skin:"#c98a5e",hair:"#d9d2c8",cloth:"#7d4b8c",cloth2:"#5d3568",accent:"#e8c34a",spirit:"#c9a8e0"},
+  raju:     {skin:"#b9784a",hair:"#241712",cloth:"#3f6fa3",cloth2:"#2c4f78",accent:"#e8e2d0",spirit:"#9fd0ff"},
+  desai:    {skin:"#bd8050",hair:"#3a2b20",cloth:"#6b6f53",cloth2:"#4d5040",accent:"#c9cdd2",spirit:"#cfe0a8"},
+  arjun:    {skin:"#c0855a",hair:"#1d1712",cloth:"#9a4a36",cloth2:"#6f3326",accent:"#3f6fa3",spirit:"#ffb38f"},
+  champa:   {skin:"#c2814f",hair:"#2a1a14",cloth:"#3f8f6b",cloth2:"#2c6a4d",accent:"#e8a72e",spirit:"#9fe0c2"},
+  player:   {skin:"#c98a5e",hair:"#241712",cloth:"#c2731f",cloth2:"#8a4d16",accent:"#f4e7cf",spirit:"#ffd9a0"}
+};
+
+/* world landmark anchors (NPC spawn coords from source data) + props */
+const NPCS=[
+  {id:"mrs_mehta", x:180,y:104, place:"tenement"},
+  {id:"raju",      x:288,y:168, place:"temple"},
+  {id:"desai",     x:392,y:128, place:"office"},
+  {id:"arjun",     x:96, y:188, place:"home"},
+  {id:"champa",    x:344,y:208, place:"stall"}
+];
+
+/* ---------- DOM refs ---------- */
+const $=s=>document.querySelector(s);
+const cv=$("#game"), ctx=cv.getContext("2d"); ctx.imageSmoothingEnabled=false;
+const buf=document.createElement("canvas"); buf.width=VW; buf.height=VH;
+const bx=buf.getContext("2d"); bx.imageSmoothingEnabled=false;
+
+/* ============================================================
+   GAME STATE
+   ============================================================ */
+const SAVE_KEY="tiffin_route_save_v1";
+let S=null;
+function freshState(bg){
+  const routes={};
+  for(const id of ORDER) routes[id]={day_state:0,trust_level:0,spirit_unlocked:false,
+    spirit_state:0,spirit_intro_done:false,spirit_resolved:false,unlocked:false,
+    notes:[],met:false,talked_day:-1,talked_night:-1};
+  const stats={EMPATHY:1,NOSE:1,STEADY_HANDS:1,STREET_SENSE:1,GRIEF:1};
+  if(bg&&stats[bg]!==undefined) stats[bg]+=1;
+  return {day:1,phase:"day",routes,stats,flags:{},background:bg,
+          deliveries:0,started:Date.now()};
+}
+function save(){ try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){} }
+function hasSave(){ try{return !!localStorage.getItem(SAVE_KEY);}catch(e){return false;} }
+function loadSave(){ try{return JSON.parse(localStorage.getItem(SAVE_KEY));}catch(e){return null;} }
+
+/* ============================================================
+   PIXEL CHARACTER DRAWING  (humanoid, 4-dir, walk frames)
+   draws into a given context at (px,py) anchored bottom-center
+   ============================================================ */
+function px(c,x,y,w,h,col){c.fillStyle=col;c.fillRect(x|0,y|0,w,h);}
+function drawPerson(c,cx,by,dir,frame,look,opt={}){
+  // figure ~14w x 22h, anchored so feet at (cx, by)
+  const x=Math.round(cx-7), y=Math.round(by-22);
+  const sk=look.skin, hr=look.hair, cl=opt.spirit?look.spirit:look.cloth, cl2=opt.spirit?look.spirit:look.cloth2, ac=look.accent;
+  const step=(frame===1)?1:(frame===3?-1:0);
+  c.save();
+  if(opt.alpha!=null) c.globalAlpha=opt.alpha;
+  // shadow
+  if(!opt.spirit){c.globalAlpha=(opt.alpha!=null?opt.alpha:1)*0.28;px(c,x+2,by-2,10,3,"#000");c.globalAlpha=(opt.alpha!=null?opt.alpha:1);}
+  // legs
+  px(c,x+3,y+16,3,6-Math.abs(step),cl2);
+  px(c,x+8,y+16,3,6-Math.abs(step>0?step:0),cl2);
+  px(c,x+3,y+16+(step>0?1:0),3,5,cl2);
+  px(c,x+8,y+16+(step<0?1:0),3,5,cl2);
+  // body / clothing
+  px(c,x+2,y+8,10,9,cl);
+  px(c,x+2,y+8,10,2,cl2);          // shoulder shade
+  px(c,x+6,y+9,2,8,ac);            // garment seam / sash
+  // arms
+  const sw=step;
+  px(c,x,y+9+(sw>0?1:0),2,7,cl);
+  px(c,x+12,y+9+(sw<0?1:0),2,7,cl);
+  px(c,x,y+15+(sw>0?1:0),2,2,sk);  // hands
+  px(c,x+12,y+15+(sw<0?1:0),2,2,sk);
+  // head
+  px(c,x+3,y,8,8,sk);
+  // hair / direction
+  if(dir==="up"){ px(c,x+3,y-1,8,5,hr); }
+  else if(dir==="down"){ px(c,x+3,y-1,8,3,hr);
+    px(c,x+4,y+3,1,1,"#1a120c");px(c,x+9,y+3,1,1,"#1a120c"); } // eyes
+  else { // side
+    px(c,x+3,y-1,8,4,hr);
+    const ex=dir==="left"?x+4:x+9; px(c,ex,y+3,1,1,"#1a120c");
+  }
+  // prop
+  if(opt.prop==="tiffin"){ px(c,x+13,y+11,4,5,"#cdd2d6");px(c,x+13,y+11,4,1,ac);px(c,x+13,y+13,4,1,"#8b9398"); }
+  if(opt.spirit){
+    c.globalAlpha=(opt.alpha!=null?opt.alpha:1)*0.5;
+    c.fillStyle=look.spirit; c.fillRect(x-2,y-3,18,26); c.globalAlpha=1;
+  }
+  c.restore();
+}
+
+/* portrait: head & shoulders, bigger, into a 48x48 ctx */
+function drawPortrait(c,look,spirit){
+  c.clearRect(0,0,48,48);
+  c.fillStyle = spirit? "#161a36":"#241a14"; c.fillRect(0,0,48,48);
+  // soft vignette
+  const g=c.createRadialGradient(24,20,4,24,24,30);
+  g.addColorStop(0, spirit?"rgba(140,170,255,.25)":"rgba(232,167,46,.22)"); g.addColorStop(1,"rgba(0,0,0,0)");
+  c.fillStyle=g; c.fillRect(0,0,48,48);
+  const sk=look.skin,hr=look.hair,cl=spirit?look.spirit:look.cloth,cl2=spirit?look.spirit:look.cloth2,ac=look.accent;
+  const ox=12,oy=10,s=3;
+  const P=(gx,gy,gw,gh,col)=>{c.fillStyle=col;c.fillRect(ox+gx*s,oy+gy*s,gw*s,gh*s);};
+  if(spirit){c.globalAlpha=.5;P(-1,-1,10,13,look.spirit);c.globalAlpha=1;}
+  P(1,8,6,5,cl2);            // shoulders
+  P(2,8,4,2,cl);
+  P(3,9,2,3,ac);            // collar/sash
+  P(1,0,6,7,sk);            // face
+  P(1,-1,6,2,hr);           // hair top
+  P(0,0,1,4,hr); P(7,0,1,4,hr);
+  c.fillStyle="#1a120c"; c.fillRect(ox+2*s,oy+3*s,s-1,s-1); c.fillRect(ox+5*s,oy+3*s,s-1,s-1); // eyes
+  c.fillStyle="rgba(0,0,0,.25)"; c.fillRect(ox+2*s,oy+6*s,4*s,1); // mouth line
+  if(spirit){ c.globalAlpha=.35;c.fillStyle=look.spirit;c.fillRect(0,0,48,48);c.globalAlpha=1; }
+}
+
+/* ============================================================
+   WORLD  — single-screen city diorama, drawn procedurally
+   ============================================================ */
+const SOLIDS=[
+  // border walls
+  {x:0,y:0,w:VW,h:8},{x:0,y:VH-6,w:VW,h:6},{x:0,y:0,w:6,h:VH},{x:VW-6,y:0,w:6,h:VH},
+  // tenement (mrs mehta) top-left block
+  {x:120,y:34,w:130,h:46},
+  // municipal office top-right
+  {x:344,y:40,w:120,h:54},
+  // arjun home left
+  {x:40,y:150,w:78,h:54},
+  // temple base center
+  {x:250,y:120,w:92,h:40},
+  // tea stall bottom-center
+  {x:300,y:218,w:96,h:30},
+  // misc crates / planter
+  {x:170,y:150,w:20,h:14},{x:228,y:210,w:16,h:16}
+];
+function rectHit(ax,ay,aw,ah,b){return ax<b.x+b.w&&ax+aw>b.x&&ay<b.y+b.h&&ay+ah>b.y;}
+function blocked(x,y,w,h){for(const s of SOLIDS)if(rectHit(x,y,w,h,s))return true;return false;}
+
+/* deterministic noise for cobble speckle */
+function hash(x,y){let n=x*374761393+y*668265263;n=(n^(n>>13))*1274126177;return ((n^(n>>16))>>>0)/4294967296;}
+
+let starField=[]; for(let i=0;i<70;i++)starField.push({x:Math.random()*VW,y:Math.random()*120,p:Math.random()});
+let motes=[]; for(let i=0;i<26;i++)motes.push({x:Math.random()*VW,y:Math.random()*VH,s:.2+Math.random()*.5,ph:Math.random()*6.28});
+
+function drawGround(c,night){
+  // base
+  c.fillStyle=night?"#14152e":"#caa15e"; c.fillRect(0,0,VW,VH);
+  // upper "sky/wash" band for depth
+  const sky=c.createLinearGradient(0,0,0,VH);
+  if(night){sky.addColorStop(0,"#23264f");sky.addColorStop(1,"#0e0f24");}
+  else{sky.addColorStop(0,"#e7b15a");sky.addColorStop(1,"#b9824a");}
+  c.fillStyle=sky;c.fillRect(0,0,VW,VH);
+  // cobble speckle
+  for(let y=8;y<VH-6;y+=4){
+    for(let x=6;x<VW-6;x+=4){
+      const h=hash(x,y);
+      if(h>0.62){
+        c.fillStyle=night
+          ?`rgba(120,130,200,${0.05+h*0.06})`
+          :`rgba(90,60,30,${0.06+h*0.10})`;
+        c.fillRect(x,y,3,2);
+      }
+    }
+  }
+  // main street (lighter path) winding between landmarks
+  c.fillStyle=night?"rgba(150,160,230,.06)":"rgba(244,231,207,.12)";
+  c.fillRect(60,90,360,40);
+  c.fillRect(150,90,40,150);
+  c.fillRect(330,120,40,110);
+}
+
+function building(c,b,night,opt={}){
+  const wall=opt.wall||(night?"#2a2c52":"#9c6a44");
+  const roof=opt.roof||(night?"#1d1f3e":"#7a4f33");
+  const win =night?opt.winN||"#ffcf7a":opt.winD||"#5a3a26";
+  c.fillStyle=wall;c.fillRect(b.x,b.y,b.w,b.h);
+  c.fillStyle="rgba(0,0,0,.18)";c.fillRect(b.x,b.y+b.h-6,b.w,6); // ground shade
+  c.fillStyle=roof;c.fillRect(b.x-2,b.y-5,b.w+4,7);             // roof lip
+  // windows grid
+  const cols=Math.floor(b.w/22), rows=Math.floor(b.h/18);
+  for(let i=0;i<cols;i++)for(let j=0;j<rows;j++){
+    const wx=b.x+8+i*22, wy=b.y+7+j*18;
+    const lit = night && (hash(wx,wy)>0.45 || opt.allLit);
+    c.fillStyle= lit?win:(night?"#171936":"#caa15e");
+    if(lit && night){c.save();c.shadowColor="#ffcf7a";c.shadowBlur=6;}
+    c.fillRect(wx,wy,9,8);
+    if(lit&&night)c.restore();
+    c.fillStyle="rgba(0,0,0,.35)";c.fillRect(wx,wy+8,9,1);
+  }
+}
+
+function drawCity(c,night){
+  drawGround(c,night);
+  if(night) for(const s of starField){c.fillStyle=`rgba(220,225,255,${0.3+0.6*Math.abs(Math.sin(time*0.001+s.p*6))})`;c.fillRect(s.x|0,s.y|0,1,1);}
+  // tenement
+  building(c,{x:120,y:34,w:130,h:46},night,{allLit:false});
+  label(c,"Flat 4B",132,30,night);
+  // office
+  building(c,{x:344,y:40,w:120,h:54},night,{wall:night?"#2e2c46":"#8a8466",roof:night?"#201f36":"#5f5a44"});
+  label(c,"Municipal Office",356,36,night);
+  // arjun home
+  building(c,{x:40,y:150,w:78,h:54},night,{wall:night?"#322a4a":"#9a5a44",roof:night?"#241d38":"#6f3326"});
+  drawDoor(c,72,178,night, S&&S.routes.arjun.spirit_resolved && night);
+  label(c,"The House",50,146,night);
+  // temple (stepped)
+  drawTemple(c,250,120,night);
+  label(c,"Temple Steps",256,112,night);
+  // tea stall
+  drawStall(c,300,218,night);
+  label(c,"Champa's Chai",306,212,night);
+  // planters / handcart (player home marker)
+  drawCart(c,196,150,night);
+  // lanterns
+  drawLantern(c,116,96,night); drawLantern(c,300,96,night); drawLantern(c,250,200,night);
+  drawLantern(c,420,150,night);
+  // foreground motes at night
+  if(night) for(const m of motes){const a=0.3+0.4*Math.sin(time*0.001+m.ph);c.fillStyle=`rgba(255,207,122,${Math.max(0,a)*0.5})`;c.fillRect((m.x)|0,(m.y+Math.sin(time*0.0007+m.ph)*6)|0,1,1);}
+}
+function label(c,t,x,y,night){c.font="6px 'Segoe UI',sans-serif";c.textBaseline="top";
+  c.fillStyle=night?"rgba(180,190,255,.5)":"rgba(40,25,15,.5)";c.fillText(t,x,y);}
+function drawDoor(c,x,y,night,open){
+  c.fillStyle=night?"#0c0e22":"#3a241a";c.fillRect(x,y,18,26);
+  c.fillStyle=open?"#ffcf7a":(night?"#1a1c3a":"#2a1812");c.fillRect(x+2,y+2,14,24);
+  if(open){c.save();c.shadowColor="#ffcf7a";c.shadowBlur=12;c.fillRect(x+2,y+2,14,24);c.restore();}
+  c.fillStyle="#e8a72e";c.fillRect(x+12,y+13,2,2);
+}
+function drawTemple(c,x,y,night){
+  const base=night?"#3a3358":"#c9a05a", edge=night?"#2a2547":"#a8803f";
+  for(let i=0;i<4;i++){c.fillStyle=i%2?edge:base;c.fillRect(x+i*4,y+i*8,92-i*8,9);}
+  // shrine top
+  c.fillStyle=night?"#241f40":"#b9442a";c.fillRect(x+34,y-18,24,20);
+  c.fillStyle=night?"#3a325c":"#e8a72e";c.fillRect(x+42,y-26,8,10);
+  if(night){c.save();c.shadowColor="#ffcf7a";c.shadowBlur=10;c.fillStyle="#ffcf7a";c.fillRect(x+44,y-22,4,5);c.restore();}
+}
+function drawStall(c,x,y,night){
+  c.fillStyle=night?"#2c2a4a":"#8a5a36";c.fillRect(x,y+8,96,22);          // counter
+  c.fillStyle=night?"#241f40":"#6f3326";c.fillRect(x-2,y-2,100,8);        // awning back
+  for(let i=0;i<8;i++){c.fillStyle=i%2?"#b9442a":"#e8c34a";c.fillRect(x+i*12,y+2,12,7);} // awning stripes
+  // kettle + steam
+  c.fillStyle=night?"#cfe0ff":"#3a2a22";c.fillRect(x+12,y+12,10,8);
+  if(!night||true){c.fillStyle=night?"rgba(207,224,255,.4)":"rgba(255,255,255,.4)";
+    c.fillRect(x+16,y+6+Math.sin(time*0.004)*1,2,5);}
+  if(night){c.save();c.shadowColor="#ffcf7a";c.shadowBlur=10;c.fillStyle="#ffcf7a";c.fillRect(x+80,y+12,5,5);c.restore();}
+}
+function drawCart(c,x,y,night){
+  c.fillStyle=night?"#3a2c1e":"#6f4a28";c.fillRect(x,y,30,12);
+  c.fillStyle="#2a1812";c.beginPath();c.arc(x+6,y+13,4,0,6.28);c.arc(x+24,y+13,4,0,6.28);c.fill();
+  // stacked tiffins
+  for(let i=0;i<3;i++){c.fillStyle="#cdd2d6";c.fillRect(x+6+i*8,y-7,6,8);c.fillStyle="#e8a72e";c.fillRect(x+6+i*8,y-7,6,1);}
+}
+function drawLantern(c,x,y,night){
+  c.fillStyle=night?"#2a2547":"#5a3a26";c.fillRect(x-1,y-10,2,10); // pole
+  if(night){c.save();c.shadowColor="#ffcf7a";c.shadowBlur=16;c.fillStyle="#ffcf7a";c.fillRect(x-3,y-16,6,7);c.restore();
+    const g=c.createRadialGradient(x,y-12,2,x,y-12,40);g.addColorStop(0,"rgba(255,207,122,.22)");g.addColorStop(1,"rgba(255,207,122,0)");
+    c.fillStyle=g;c.fillRect(x-40,y-52,80,80);}
+  else{c.fillStyle="#7a4f33";c.fillRect(x-3,y-16,6,7);}
+}
+
+/* ============================================================
+   ENTITIES / PLAYER
+   ============================================================ */
+const player={x:206,y:150,w:10,h:6,dir:"down",moving:false,anim:0,fr:0};
+const keys={};
+let time=0, lastNear=null, moveTarget=null;
+
+function update(dt){
+  time+=dt;
+  if(mode!=="play"){return;}
+  let dx=0,dy=0,sp=0.055*dt;
+  if(keys["w"]||keys["arrowup"])dy-=1;
+  if(keys["s"]||keys["arrowdown"])dy+=1;
+  if(keys["a"]||keys["arrowleft"])dx-=1;
+  if(keys["d"]||keys["arrowright"])dx+=1;
+  if(!dx&&!dy&&moveTarget){
+    const tx=moveTarget.x-(player.x+player.w/2), ty=moveTarget.y-(player.y+player.h/2);
+    if(Math.hypot(tx,ty)<3.5){moveTarget=null;} else {dx=tx;dy=ty;}
+  }
+  player.moving=(dx||dy)!==0;
+  const _ox=player.x,_oy=player.y;
+  if(dx||dy){
+    const l=Math.hypot(dx,dy);dx/=l;dy/=l;
+    if(Math.abs(dx)>Math.abs(dy))player.dir=dx<0?"left":"right";else player.dir=dy<0?"up":"down";
+    const nx=player.x+dx*sp, ny=player.y+dy*sp;
+    if(!blocked(nx,player.y,player.w,player.h))player.x=nx;
+    if(!blocked(player.x,ny,player.w,player.h))player.y=ny;
+    player.anim+=dt; if(player.anim>140){player.anim=0;player.fr=(player.fr+1)%4;}
+    if(moveTarget && Math.abs(player.x-_ox)<0.04 && Math.abs(player.y-_oy)<0.04) moveTarget=null; // stuck → stop
+  } else {player.fr=0;}
+  // nearest npc
+  lastNear=nearestNPC();
+  updatePrompt();
+}
+function nearestNPC(){
+  let best=null,bd=26*26;
+  for(const n of NPCS){
+    const r=S.routes[n.id];
+    if(S.phase==="night" && !r.met) continue;            // unknown at night
+    const cx=player.x+player.w/2, cy=player.y+player.h/2;
+    const d=(cx-n.x)**2+(cy-(n.y))**2;
+    if(d<bd){bd=d;best=n;}
+  }
+  return best;
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(){
+  const night=S&&S.phase==="night";
+  drawCity(bx,night);
+  // draw entities sorted by y (painter)
+  const ents=[];
+  for(const n of NPCS){
+    const r=S.routes[n.id];
+    if(S.phase==="night"){ if(!r.met) continue; }
+    ents.push({y:n.y,draw:()=>drawNPC(n,night)});
+  }
+  ents.push({y:player.y+player.h,draw:()=>drawPerson(bx,player.x+player.w/2,player.y+player.h,player.dir,player.fr,LOOK.player,
+      {prop:S.phase==="day"?"tiffin":null})});
+  ents.sort((a,b)=>a.y-b.y);
+  for(const e of ents)e.draw();
+
+  // day/night colour grade
+  if(night){bx.globalCompositeOperation="multiply";bx.fillStyle="#5b63b0";bx.fillRect(0,0,VW,VH);bx.globalCompositeOperation="source-over";
+    bx.fillStyle="rgba(20,21,46,.25)";bx.fillRect(0,0,VW,VH);}
+  else{bx.globalCompositeOperation="multiply";bx.fillStyle="#ffe9c0";bx.fillRect(0,0,VW,VH);bx.globalCompositeOperation="source-over";}
+  // vignette
+  const vg=bx.createRadialGradient(VW/2,VH/2,80,VW/2,VH/2,300);
+  vg.addColorStop(0,"rgba(0,0,0,0)");vg.addColorStop(1,night?"rgba(4,4,14,.55)":"rgba(40,20,8,.4)");
+  bx.fillStyle=vg;bx.fillRect(0,0,VW,VH);
+
+  // blit scaled
+  const scale=Math.max(1,Math.min(Math.floor(cv.width/VW),Math.floor(cv.height/VH)));
+  ctx.clearRect(0,0,cv.width,cv.height);
+  const dw=VW*scale, dh=VH*scale;
+  ctx.drawImage(buf,((cv.width-dw)/2)|0,((cv.height-dh)/2)|0,dw,dh);
+}
+function drawNPC(n,night){
+  const r=S.routes[n.id];
+  // gentle idle bob
+  const bob=Math.sin(time*0.002+n.x)*0.6;
+  const spirit = night;
+  const look=LOOK[n.id];
+  // facing roughly toward player
+  let dir="down"; const cx=player.x+player.w/2;
+  if(Math.abs(cx-n.x)>10) dir=cx<n.x?"left":"right";
+  if(spirit && !r.spirit_unlocked){
+    // faint unknowable shape
+    drawPerson(bx,n.x,n.y+bob,dir,0,look,{spirit:true,alpha:0.28});
+  } else {
+    drawPerson(bx,n.x,n.y+bob,dir,0,look,{spirit:spirit,alpha:spirit?(r.spirit_resolved?0.55:0.92):1});
+  }
+  // resolved spirit gets a calm halo
+  if(spirit&&r.spirit_resolved){const g=bx.createRadialGradient(n.x,n.y-10,2,n.x,n.y-10,26);
+    g.addColorStop(0,"rgba(180,210,255,.4)");g.addColorStop(1,"rgba(180,210,255,0)");bx.fillStyle=g;bx.fillRect(n.x-26,n.y-36,52,52);}
+}
+
+/* ============================================================
+   HUD
+   ============================================================ */
+const HUD={
+  refresh(){
+    $("#hud").className=(S.phase==="night"?"night show":"day show");
+    $("#dayLabel").textContent="Day "+S.day;
+    $("#phaseLabel").textContent=S.phase==="night"?"The Spirit-City":"Morning Route";
+    // stats
+    const sc=$("#stats");sc.innerHTML="";
+    for(const k of SKILLS){
+      const v=S.stats[k];const el=document.createElement("div");el.className="stat";
+      let pips="";for(let i=0;i<5;i++)pips+=`<span class="pip ${i<v?'on':''}"></span>`;
+      el.innerHTML=`<span class="dot" style="background:${SKILL_COLOR[k]}"></span>
+        <span class="nm">${SKILL_SHORT[k]}</span><span class="pips">${pips}</span>`;
+      sc.appendChild(el);
+    }
+    HUD.objective();
+  },
+  objective(){
+    const resolved=ORDER.filter(id=>S.routes[id].spirit_resolved).length;
+    let t;
+    if(S.phase==="day"){
+      const need=ORDER.filter(id=>S.routes[id].day_state<3 && S.routes[id].talked_day!==S.day);
+      if(resolved===5) t="Every letter delivered. Rest, and let the route carry you home.";
+      else if(need.length) t="Walk the route. Deliver tiffin and listen (E). Press R to rest into night.";
+      else t="You've spoken to everyone today. Press R to rest — the night-route opens after dark.";
+    } else {
+      const ready=ORDER.filter(id=>S.routes[id].spirit_unlocked && !S.routes[id].spirit_resolved);
+      if(resolved===5) t="All five are at peace. Press R to greet the morning.";
+      else if(ready.length) t="Spirits wait in the lantern-light. Carry what they can't (E). R to sleep.";
+      else t="No spirit is ready yet. Deepen the day-route first. Press R to sleep.";
+    }
+    $("#objText").textContent=t+`   ·   Resolved ${resolved}/5`;
+  },
+  toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(HUD._tt);
+    HUD._tt=setTimeout(()=>t.classList.remove("show"),2600);}
+};
+function updatePrompt(){
+  const p=$("#interactPrompt");
+  if(mode!=="play"||!lastNear){p.classList.remove("show");return;}
+  const n=lastNear, r=S.routes[n.id];
+  let txt;
+  if(S.phase==="day"){
+    if(!r.met) txt="E · Meet";
+    else if(r.talked_day===S.day) txt="E · Speak";
+    else txt="E · Deliver";
+  } else {
+    txt = r.spirit_unlocked? (r.spirit_resolved?"E · Visit":"E · Listen") : "E · ⟡";
+  }
+  p.textContent=txt;
+  const scale=Math.max(1,Math.min(Math.floor(cv.width/VW),Math.floor(cv.height/VH)));
+  const ox=(cv.width-VW*scale)/2, oy=(cv.height-VH*scale)/2;
+  p.style.left=(ox+n.x*scale)+"px";
+  p.style.top=(oy+(n.y-24)*scale)+"px";
+  p.classList.add("show");
+}
+
+/* ============================================================
+   DIALOGUE ENGINE
+   ============================================================ */
+const Dlg={
+  active:false, npc:null, tree:null, node:null, typing:false, full:"", ti:0, onEndKind:null,
+  pickDayTree(r){
+    if(r.day_state>=3) return null;            // day-arc complete
+    if(r.day_state===0) return "first_meeting";
+    if(r.day_state===1) return "developing";
+    return "trust";
+  },
+  pickNightTree(r){
+    if(!r.spirit_unlocked) return "spirit_not_ready";
+    if(!r.spirit_intro_done) return "spirit_intro";
+    if(!r.spirit_resolved) return "spirit_resolution";
+    return "spirit_aftermath";
+  },
+  interact(n){
+    const r=S.routes[n.id], data=NPC_DATA[n.id];
+    let treeId, kind;
+    if(S.phase==="day"){
+      if(!r.met){r.met=true;}
+      if(r.talked_day===S.day || r.day_state>=3){ kind="idle-day"; }
+      else { treeId=this.pickDayTree(r); kind="day"; r.talked_day=S.day; if(!r.day_state){S.deliveries++;} else S.deliveries++; }
+    } else {
+      if(!r.spirit_unlocked){ this.runMini(data,"spirit_not_ready"); return; }
+      if(r.talked_night===S.day){ kind="idle-night"; }
+      else { treeId=this.pickNightTree(r); kind="night"; r.talked_night=S.day; }
+    }
+    if(kind==="idle-day"){ this.runLine(n, idleDay(n.id)); return; }
+    if(kind==="idle-night"){ this.runLine(n, idleNight(n.id)); return; }
+    const tree=data.dialogue_trees[treeId];
+    if(!tree){ this.runLine(n, "…"); return; }
+    this.npc=n; this.tree=tree; this.onEndKind=kind;
+    this.open(); this.go(tree.start);
+    save();
+  },
+  runMini(data,treeId){ // spirit_not_ready narration
+    const n=lastNear; this.npc=n; this.tree=data.dialogue_trees[treeId]; this.onEndKind="mini";
+    this.open(); this.go(this.tree.start);
+  },
+  runLine(n,text){ this.npc=n; this.tree=null; this.onEndKind="line"; this.open();
+    this.renderNode({speaker:n? (S.phase==="night"?"Spirit — "+NPC_DATA[n.id].name:NPC_DATA[n.id].name):null,text,voice_interjections:[],choices:[],next:"END"});},
+  open(){this.active=true;mode="dialogue";moveTarget=null;$("#dlg").classList.add("show");$("#interactPrompt").classList.remove("show");},
+  close(){this.active=false;$("#dlg").classList.remove("show");mode="play";HUD.refresh();save();},
+  go(nodeId){
+    if(nodeId==="END"||!nodeId){ this.finish(); return; }
+    const node=this.tree.nodes[nodeId];
+    if(!node){ this.finish(); return; }
+    this.node=nodeId;
+    if(node.effects) applyEffects(this.npc.id,node.effects);
+    this.renderNode(node);
+  },
+  renderNode(node){
+    const isNarr = (node.speaker===null || node.speaker==="NARRATOR");
+    const spk=$("#speaker"); const por=$("#portrait");
+    if(isNarr){ spk.textContent=""; por.style.visibility="hidden"; }
+    else{
+      por.style.visibility="visible";
+      const spirit = /Spirit/i.test(node.speaker||"");
+      spk.className = spirit?"spirit":"";
+      const id=this.npc?this.npc.id:null;
+      const ttl = id?`<span class="ttl">${NPC_DATA[id].title}</span>`:"";
+      spk.innerHTML=(node.speaker||"")+ttl;
+      if(id) paintPortrait(por, id, spirit|| (S.phase==="night"));
+    }
+    // voices
+    const vc=$("#dlgVoices");vc.innerHTML="";
+    (node.voice_interjections||[]).forEach(v=>{
+      if(S.stats[v.skill]>= (v.requires_stat||0)){
+        const el=document.createElement("div");el.className="voice";
+        el.style.borderColor=SKILL_COLOR[v.skill];el.style.color="#efe4d4";
+        el.innerHTML=`<span class="vn" style="color:${SKILL_COLOR[v.skill]}">${v.skill.replace('_',' ')}</span>${v.text}`;
+        vc.appendChild(el);
+      }
+    });
+    // text typewriter
+    const dt=$("#dlgText"); dt.className= isNarr?"narr":"";
+    this.full=node.text||""; this.ti=0; dt.textContent=""; this.typing=true;
+    $("#choices").innerHTML=""; $("#continueHint").style.visibility="hidden";
+    this._node=node;
+    clearInterval(this._typer);
+    this._typer=setInterval(()=>{
+      if(this.ti>=this.full.length){clearInterval(this._typer);this.typing=false;this.showAfterText();return;}
+      dt.textContent+=this.full[this.ti++];
+      blip();
+    },16);
+  },
+  skip(){ if(this.typing){clearInterval(this._typer);$("#dlgText").textContent=this.full;this.typing=false;this.showAfterText();} else {this.advance();} },
+  showAfterText(){
+    const node=this._node;
+    const ch=$("#choices");ch.innerHTML="";
+    if(node.choices&&node.choices.length){
+      node.choices.forEach(c=>{
+        const b=document.createElement("button");b.className="choice";
+        let tag="";
+        if(c.stat_check){const k=c.stat_check.skill,th=c.stat_check.threshold;
+          const ok=S.stats[k]>=th;
+          tag=`<span class="tag" style="background:${SKILL_COLOR[k]}33;color:${SKILL_COLOR[k]};border:1px solid ${SKILL_COLOR[k]}">${SKILL_SHORT[k]} ${th}${ok?' ✓':''}</span>`;
+          if(!ok)b.classList.add("locked");
+        }
+        // strip leading [SKILL n] label already represented by tag
+        let label=c.text.replace(/^\[[A-Z_]+\s*\d+\]\s*/,"");
+        b.innerHTML=tag+label;
+        b.onclick=()=>this.choose(c);
+        ch.appendChild(b);
+      });
+      $("#continueHint").style.visibility="hidden";
+    } else {
+      $("#continueHint").style.visibility="visible";
+    }
+  },
+  choose(c){
+    let next=c.next;
+    if(c.stat_check){
+      const ok=S.stats[c.stat_check.skill]>=c.stat_check.threshold;
+      if(!ok && c.fail_next) next=c.fail_next;
+      HUD.toast(ok?`${c.stat_check.skill.replace('_',' ')} ✓  success`:`${c.stat_check.skill.replace('_',' ')} — not yet`);
+    }
+    if(c.effects)applyEffects(this.npc.id,c.effects);
+    this.go(next);
+  },
+  advance(){
+    const node=this._node;
+    if(node.choices&&node.choices.length)return; // must choose
+    this.go(node.next||"END");
+  },
+  finish(){
+    const kind=this.onEndKind;
+    const id=this.npc?this.npc.id:null;
+    this.close();
+    if(id){
+      const r=S.routes[id];
+      // post-conversation feedback
+      if(kind==="day"){
+        // safety net: the deeper (day 2+) conversation always opens the spirit path,
+        // so no storyline can soft-lock on a single dialogue branch.
+        if(r.day_state>=2 && !r.spirit_unlocked) r.spirit_unlocked=true;
+        if(r.spirit_unlocked && !r.spirit_intro_done)
+          HUD.toast(NPC_DATA[id].name+" has something they can't carry. Return after dark.");
+      }
+      if(kind==="night"){
+        if(r.spirit_resolved){ HUD.toast("Delivered. "+NPC_DATA[id].name+" is at peace."); checkEnding(); }
+      }
+    }
+    save();
+  }
+};
+function idleDay(id){
+  const r=S.routes[id];
+  const lines={
+    mrs_mehta:"Come tomorrow, beta. I'll leave the container outside.",
+    raju:"Thanks for the food. I'm still… thinking.",
+    desai:"That's all for today. Window 4 side, remember.",
+    arjun:"Leave it at the door. We'll sort it out.",
+    champa:"Drink your chai. Come back tomorrow — I'll read your mood again."
+  };
+  if(r.day_state>=3) return (r.spirit_unlocked && !r.spirit_resolved)
+    ? "There's nothing more to say in daylight. Whatever's left… it waits for the dark."
+    : lines[id];
+  return lines[id];
+}
+function idleNight(id){return "The lantern-light hums. There is nothing more to carry tonight.";}
+
+/* ---------- effects ---------- */
+function applyEffects(id,fx){
+  if(!fx)return; const r=S.routes[id];
+  if(fx.route_update)for(const k in fx.route_update){ r[k]=fx.route_update[k]; }
+  if(fx.stat_modify)for(const k in fx.stat_modify){ S.stats[k]=Math.max(0,Math.min(5,(S.stats[k]||0)+fx.stat_modify[k])); HUD.toast(k.replace('_',' ')+" +"+fx.stat_modify[k]); }
+  if(fx.set_flag) S.flags[fx.set_flag]=true;
+  if(fx.add_note && r.notes.indexOf(fx.add_note)<0) r.notes.push(fx.add_note);
+  HUD.refresh();
+}
+
+/* ============================================================
+   DAY / NIGHT / REST
+   ============================================================ */
+function rest(){
+  if(mode!=="play")return;
+  if(S.phase==="day"){
+    fadeTo(()=>{ S.phase="night"; placePlayer(); HUD.refresh(); HUD.toast("Night falls. The city dreams — and you can walk its dream.");save(); });
+  } else {
+    fadeTo(()=>{
+      // resolve a new dawn
+      S.day++; S.phase="day"; placePlayer(); HUD.refresh();
+      HUD.toast("Day "+S.day+". The route begins again."); save();
+    });
+  }
+}
+function placePlayer(){ player.x=206;player.y=152;player.dir="up"; }
+
+/* ============================================================
+   JOURNAL
+   ============================================================ */
+const Journal={
+  open(){if(mode==="dialogue")return; this._prev=mode; mode="journal";$("#journal").classList.add("show");this.tab(this._tab||"routes");},
+  close(){$("#journal").classList.remove("show");mode="play";},
+  _tab:"routes",
+  tab(t){this._tab=t;document.querySelectorAll(".jtab").forEach(b=>b.classList.toggle("active",b.dataset.tab===t));
+    const body=$("#jbody");body.innerHTML="";
+    if(t==="routes")this.routes(body);else this.skills(body);},
+  routes(body){
+    for(const id of ORDER){
+      const r=S.routes[id],d=NPC_DATA[id];
+      const card=document.createElement("div");card.className="routeCard";
+      let badge,bc;
+      if(r.spirit_resolved){badge="At peace";bc="b-done";}
+      else if(r.spirit_unlocked&&S.phase!=null&&(r.spirit_intro_done||S.phase==="night")){badge="Spirit waiting";bc="b-spirit";}
+      else if(r.met&&r.day_state>0){badge="On the route";bc="b-prog";}
+      else{badge=r.met?"Met":"Not yet met";bc="b-new";}
+      // avatar
+      const av=document.createElement("canvas");av.width=40;av.height=40;av.className="rc-av";
+      paintPortrait(av, id, r.spirit_resolved);
+      const steps=[0,1,2].map(i=>`<div class="rc-step ${r.day_state>i?'on':''}"></div>`).join("")+
+        `<div class="rc-step ${r.spirit_unlocked?'spirit':''}"></div>`+
+        `<div class="rc-step ${r.spirit_resolved?'spirit':''}"></div>`;
+      const notes=r.met? (r.notes.length?r.notes.map(n=>`<li>${n}</li>`).join(""):`<li class="muted">No notes yet — talk and listen.</li>`)
+                       : `<li class="muted">Somewhere on Babulal's old route.</li>`;
+      card.innerHTML=`<div class="rc-top"></div>
+        <div class="rc-track">${steps}</div>
+        <ul class="rc-notes">${notes}</ul>`;
+      const top=card.querySelector(".rc-top");top.appendChild(av);
+      const nm=document.createElement("div");nm.className="rc-name";
+      nm.innerHTML=(r.met?d.name:"? ? ?")+`<span class="t">${r.met?d.title:"unknown to you"}</span>`;
+      top.appendChild(nm);
+      const bd=document.createElement("span");bd.className="rc-badge "+bc;bd.textContent=badge;top.appendChild(bd);
+      body.appendChild(card);
+    }
+  },
+  skills(body){
+    const intro=document.createElement("p");intro.className="muted";intro.style.marginBottom="12px";
+    intro.style.lineHeight="1.5";
+    intro.textContent="Your grandfather left more than a route. These are the voices you deliver with — they speak up when you're sharp enough to hear them. They grow as you listen.";
+    body.appendChild(intro);
+    for(const k of SKILLS){
+      const v=S.stats[k];
+      const card=document.createElement("div");card.className="skillCard";
+      const samp=SKILL_VOICES[k]?SKILL_VOICES[k][0]:"";
+      let pips="";for(let i=0;i<5;i++)pips+=`<i style="background:${i<v?SKILL_COLOR[k]:''}"></i>`;
+      card.innerHTML=`<div class="sk-orb" style="background:${SKILL_COLOR[k]};box-shadow:0 0 12px ${SKILL_COLOR[k]}"></div>
+        <div><div class="sk-nm" style="color:${SKILL_COLOR[k]}">${k.replace('_',' ')}</div>
+        <div class="sk-pips">${pips}</div>
+        <div class="sk-desc">${SKILL_DESC[k]}<br><span style="opacity:.7">“${samp}”</span></div></div>`;
+      body.appendChild(card);
+    }
+  }
+};
+
+/* ============================================================
+   CINEMATICS  (intro, ending, about)
+   ============================================================ */
+const dawnArt = KEYART, nightArt = paintScene(true);
+function paintScene(night){
+  const c=document.createElement("canvas");c.width=VW;c.height=VH;const g=c.getContext("2d");g.imageSmoothingEnabled=false;
+  drawCity(g,night);
+  if(night){g.globalCompositeOperation="multiply";g.fillStyle="#5b63b0";g.fillRect(0,0,VW,VH);}
+  else{g.globalCompositeOperation="multiply";g.fillStyle="#ffe3b0";g.fillRect(0,0,VW,VH);}
+  g.globalCompositeOperation="source-over";
+  return c.toDataURL();
+}
+const Cine={
+  seq:null,i:0,after:null,
+  play(lines,after,art){
+    this.seq=lines;this.i=0;this.after=after||(()=>{});
+    mode="cine";$("#hud").classList.remove("show");$("#touchUI").classList.remove("show");$("#cine").classList.add("show");
+    $("#cineArt").style.backgroundImage=`url(${art||dawnArt})`;
+    this.step();
+  },
+  step(){
+    if(!this.seq){ return; }
+    const t=$("#cineText");
+    if(this.i>=this.seq.length){ this.end(); return; }
+    const item=this.seq[this.i++];
+    if(item.art){$("#cineArt").style.backgroundImage=`url(${item.art})`;}
+    t.classList.remove("in");
+    setTimeout(()=>{ t.textContent=item.t!==undefined?item.t:item; t.classList.add("in");
+      // slow ken-burns
+      $("#cineArt").style.transform = (this.i%2?"scale(1.12) translateX(-2%)":"scale(1.08) translateX(2%)");
+    },420);
+  },
+  end(){$("#cine").classList.remove("show");const a=this.after;this.after=null;this.seq=null;if(a)a();},
+  intro(){
+    const bg=S?S.background:null;
+    const L=[
+      {t:"Forty years, your grandfather Babulal walked this route.",art:dawnArt},
+      {t:"Tiffin by tiffin, he fed a whole neighbourhood — and knew every order by heart.",},
+      {t:"Last monsoon, he set down his cart for the last time. The route is yours now.",},
+      {t:"On the first morning, you notice what he never told you:",},
+      {t:"some of the people on this route are not entirely… here.",art:nightArt},
+      {t:"By day you carry food. By the city's dream-light, you carry the things they could never say.",},
+      {t:"Five families. Five unfinished deliveries. One season to complete the route.",art:dawnArt}
+    ];
+    this.play(L,()=>chooseBackground(),dawnArt);
+  },
+  about(){
+    this.play([
+      {t:"The Tiffin Route",art:dawnArt},
+      "A small narrative game about delivery, grief, and the words we carry for each other.",
+      "Walk with WASD or arrow keys. Press E to deliver and listen. J opens your route journal. R rests you into night — and back.",
+      "Your five inner voices — Empathy, Nose, Steady Hands, Street Sense, Grief — speak when you're sharp enough to hear them. Choices marked [VOICE n] test a skill.",
+      "Help all five families finish what they couldn't. Then the route lets you rest."
+    ],()=>{ $("#title").classList.add("show"); mode="title"; }, dawnArt);
+  },
+  ending(){
+    const L=[
+      {t:"The last lantern dims. The dream-city loosens its hold.",art:nightArt},
+      {t:"Mrs. Mehta sleeps without setting out two cups.",},
+      {t:"Raju is on a train, rehearsing the word 'hello.'",},
+      {t:"Desai files the right form, in his own name, without shame.",art:dawnArt},
+      {t:"A door that stood shut for six years stands open; two men sit inside.",},
+      {t:"Champa's kettle waits. 'Back in two weeks,' the note says. 'Kettle is on the left.'",},
+      {t:"Your grandfather knew: the route was never only about the food.",},
+      {t:"You set down the cart. Tomorrow, someone new will be hungry. For now — rest.",art:dawnArt},
+      {t:"— Thank you for walking The Tiffin Route —"}
+    ];
+    this.play(L,()=>{ Game.toTitle(); }, nightArt);
+  }
+};
+function checkEnding(){
+  if(ORDER.every(id=>S.routes[id].spirit_resolved)){
+    setTimeout(()=>{ if(mode==="play"){ fadeTo(()=>Cine.ending()); } },1400);
+  }
+}
+
+/* ---------- background / character choice ---------- */
+function chooseBackground(){
+  const opts=[
+    {k:"EMPATHY",t:"You always read the room before you spoke.",l:"You feel what people won't say."},
+    {k:"NOSE",t:"You have your grandfather's nose for the truth.",l:"Kitchens and collars tell you everything."},
+    {k:"STREET_SENSE",t:"You grew up in these gullies.",l:"You know who's waiting and who's lying."},
+    {k:"GRIEF",t:"You've carried your own losses.",l:"Sorrow doesn't frighten you."}
+  ];
+  // simple chooser using dialogue overlay styling
+  mode="cine";$("#hud").classList.remove("show");$("#touchUI").classList.remove("show");$("#cine").classList.add("show");
+  $("#cineArt").style.backgroundImage=`url(${dawnArt})`;
+  const t=$("#cineText");t.classList.add("in");
+  t.innerHTML=`<div style="font-size:18px;margin-bottom:18px;color:var(--dusk);letter-spacing:.04em">Before the first delivery — what did your grandfather always say you had?</div>
+    <div id="bgChoices" style="display:flex;flex-direction:column;gap:10px;max-width:520px;margin:0 auto"></div>`;
+  $("#cineHint").style.display="none";
+  const box=document.getElementById("bgChoices");
+  opts.forEach(o=>{
+    const b=document.createElement("button");b.className="btn";b.style.textAlign="left";
+    b.innerHTML=`<b style="color:${SKILL_COLOR[o.k]}">${o.t}</b><br><span class="muted" style="font-size:13px">+1 ${o.k.replace('_',' ')} · ${o.l}</span>`;
+    b.onclick=()=>{ S.background=o.k; S.stats[o.k]=Math.min(5,S.stats[o.k]+1);
+      $("#cineHint").style.display=""; $("#cine").classList.remove("show"); startPlay(true); };
+    box.appendChild(b);
+  });
+}
+
+/* ============================================================
+   FADE / FLOW
+   ============================================================ */
+function fadeTo(fn){const f=$("#fade");f.classList.add("show");setTimeout(()=>{fn();setTimeout(()=>f.classList.remove("show"),60);},560);}
+
+let mode="title"; // title | cine | play | dialogue | journal
+
+const Game={
+  newGame(){ $("#title").classList.remove("show"); S=freshState(null);
+    fadeTo(()=>Cine.intro()); },
+  continueGame(){ const d=loadSave(); if(!d)return; S=d;
+    $("#title").classList.remove("show"); fadeTo(()=>startPlay(false)); },
+  toTitle(){ S=null; mode="title"; $("#hud").classList.remove("show"); $("#touchUI").classList.remove("show"); $("#settings").classList.remove("show");
+    $("#title").classList.add("show"); $("#btnContinue").disabled=!hasSave(); }
+};
+function startPlay(fresh){
+  mode="play"; placePlayer(); $("#hud").classList.add("show"); $("#touchUI").classList.add("show"); HUD.refresh();
+  if(fresh){ HUD.toast("Walk the route (WASD). Press E to deliver and listen."); save(); }
+}
+
+/* ============================================================
+   INPUT
+   ============================================================ */
+addEventListener("keydown",e=>{
+  const k=e.key.toLowerCase();
+  keys[k]=true;
+  if(mode==="cine"){ if(k===" "||k==="enter"){e.preventDefault();Cine.step();} return; }
+  if(mode==="dialogue"){
+    if(k===" "||k==="enter"){e.preventDefault();Dlg.skip();}
+    return;
+  }
+  if(mode==="paused"){ if(k==="escape")closeSettings(); return; }
+  if(mode==="journal"){ if(k==="j"||k==="escape")Journal.close(); return; }
+  if(mode==="play"){
+    if(k==="e"){ if(lastNear)Dlg.interact(lastNear); }
+    else if(k==="j"){ Journal.open(); }
+    else if(k==="r"){ rest(); }
+    else if(k==="escape"){ openSettings(); }
+  }
+});
+addEventListener("keyup",e=>{keys[e.key.toLowerCase()]=false;});
+/* settings / pause + touch buttons */
+function openSettings(){ if(mode!=="play")return; mode="paused"; moveTarget=null; $("#settings").classList.add("show"); }
+function closeSettings(){ $("#settings").classList.remove("show"); if(mode==="paused")mode="play"; }
+function toggleMute(){ muted=!muted; $("#btnMute").textContent="Sound: "+(muted?"Off":"On"); }
+$("#tbSet").addEventListener("click",openSettings);
+$("#tbJournal").addEventListener("click",()=>{ if(mode==="play")Journal.open(); });
+$("#tbRest").addEventListener("click",()=>{ if(mode==="play")rest(); });
+$("#btnResume").addEventListener("click",closeSettings);
+$("#btnMute").addEventListener("click",toggleMute);
+$("#btnTitle").addEventListener("click",()=>{ closeSettings(); Game.toTitle(); });
+// click / tap
+$("#cine").addEventListener("click",()=>{ if(mode==="cine"&&!document.getElementById("bgChoices"))Cine.step(); });
+$("#dlg").addEventListener("click",e=>{ if(mode==="dialogue"&&!e.target.closest(".choice"))Dlg.skip(); });
+function canvasPoint(e){const r=cv.getBoundingClientRect();const t=(e.touches&&e.touches[0])?e.touches[0]:e;
+  return {x:(t.clientX-r.left)*VW/r.width, y:(t.clientY-r.top)*VH/r.height};}
+function onCanvasTap(e){ if(mode!=="play")return; if(e.cancelable)e.preventDefault();
+  const p=canvasPoint(e); let best=null,bd=24*24;
+  for(const n of NPCS){const rr=S.routes[n.id]; if(S.phase==="night"&&!rr.met)continue;
+    const d=(p.x-n.x)**2+(p.y-(n.y-8))**2; if(d<bd){bd=d;best=n;}}
+  if(best){ const cx=player.x+player.w/2,cy=player.y+player.h/2;
+    if((cx-best.x)**2+(cy-best.y)**2<26*26){ moveTarget=null; Dlg.interact(best); }
+    else moveTarget={x:best.x,y:best.y+6};
+  } else moveTarget={x:Math.max(8,Math.min(VW-8,p.x)),y:Math.max(8,Math.min(VH-8,p.y))}; }
+cv.addEventListener("click",onCanvasTap);
+cv.addEventListener("touchstart",onCanvasTap,{passive:false});
+
+/* ============================================================
+   AUDIO (tiny optional WebAudio blips)
+   ============================================================ */
+let actx=null,muted=false;
+function blip(){ if(muted)return; try{
+  if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();
+  if(Dlg.ti%2)return;
+  const o=actx.createOscillator(),g=actx.createGain();
+  o.type="square";o.frequency.value=380+Math.random()*60;g.gain.value=0.015;
+  o.connect(g);g.connect(actx.destination);o.start();g.gain.exponentialRampToValueAtTime(0.0001,actx.currentTime+0.05);o.stop(actx.currentTime+0.05);
+}catch(e){} }
+
+/* ============================================================
+   RESIZE + LOOP
+   ============================================================ */
+function resize(){
+  const W=innerWidth,H=innerHeight;
+  // keep 16:9-ish, integer scale of 480x270
+  let scale=Math.max(1,Math.min(Math.floor(W/VW),Math.floor(H/VH)));
+  // allow upscale beyond integer if screen big, but keep pixel via CSS size
+  cv.width=VW*scale; cv.height=VH*scale;
+  cv.style.width=(VW*scale)+"px"; cv.style.height=(VH*scale)+"px";
+  ctx.imageSmoothingEnabled=false;
+}
+addEventListener("resize",resize); resize();
+
+let last=performance.now();
+function loop(t){ const dt=Math.min(50,t-last); last=t;
+  update(dt);
+  if(S) render();
+  else { drawCity(bx,true); ctx.clearRect(0,0,cv.width,cv.height);
+    const scale=Math.max(1,Math.min(Math.floor(cv.width/VW),Math.floor(cv.height/VH)));
+    ctx.drawImage(buf,((cv.width-VW*scale)/2)|0,((cv.height-VH*scale)/2)|0,VW*scale,VH*scale); }
+  requestAnimationFrame(loop);
+}
+$("#btnContinue").disabled=!hasSave();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

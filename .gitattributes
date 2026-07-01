@@ -1,0 +1,16 @@
+# Normalize text to LF in the repo; auto-detect text vs binary.
+* text=auto eol=lf
+
+# Explicit binary asset types (never touch line endings / diff)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ogg binary
+*.ogv binary
+*.mp3 binary
+*.m4a binary
+*.wav binary
+*.mp4 binary
+*.zip binary

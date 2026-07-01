@@ -1,0 +1,22 @@
+# Godot 4+ engine cache (regenerated on open; must NOT be committed)
+.godot/
+
+# Godot 4 legacy import cache (if present)
+.import/
+
+# Exported builds
+/exports/
+
+# Stale/local asset archives (regenerable, keeps repo lean)
+*.zip
+
+# Mono/C# (unused here, kept for safety)
+.mono/
+data_*/
+
+# OS / editor cruft
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.tmp
+*~

@@ -1,0 +1,44 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/npc/NPCSpirit.gd" id="1_spirit"]
+
+[sub_resource type="RectangleShape2D" id="NPCShape"]
+size = Vector2(10, 10)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 20.0
+
+[node name="NPCSpirit" type="StaticBody2D"]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_spirit")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("NPCShape")
+
+[node name="NameLabel" type="Label" parent="."]
+offset_left = -30.0
+offset_top = -36.0
+offset_right = 30.0
+offset_bottom = -22.0
+horizontal_alignment = 1
+modulate = Color(0.7, 0.65, 0.95, 0.8)
+theme_override_font_sizes/font_size = 7
+
+[node name="GlowLight" type="PointLight2D" parent="."]
+color = Color(0.4, 0.35, 0.75, 1)
+energy = 0.8
+texture_scale = 1.5
+
+[node name="InteractionArea" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 4
+monitoring = true
+monitorable = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea"]
+shape = SubResource("InteractShape")

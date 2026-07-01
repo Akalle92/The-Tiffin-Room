@@ -1,0 +1,190 @@
+[gd_scene load_steps=20 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://scenes/npc/npc.tscn" id="2_npc"]
+[ext_resource type="Texture2D" path="res://assets/tiles/cobblestone_day.png" id="3_cobble_day"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tenement_facade.png" id="4_tenement"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/chai_stall.png" id="5_chai"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/municipal_office.png" id="6_office"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/market_props.png" id="7_market"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/player_world.png" id="8_player_world"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/mrs_mehta_world.png" id="9_mrs_mehta_world"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/raju_world.png" id="10_raju_world"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/champa_world.png" id="11_champa_world"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/desai_world.png" id="12_desai_world"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/arjun_world.png" id="13_arjun_world"]
+
+[sub_resource type="RectangleShape2D" id="Shape_ground"]
+size = Vector2(480, 270)
+
+[sub_resource type="RectangleShape2D" id="Shape_wall_top"]
+size = Vector2(480, 20)
+
+[sub_resource type="RectangleShape2D" id="Shape_wall_left"]
+size = Vector2(20, 270)
+
+[sub_resource type="RectangleShape2D" id="Shape_wall_right"]
+size = Vector2(20, 270)
+
+[sub_resource type="RectangleShape2D" id="Shape_wall_bottom"]
+size = Vector2(480, 20)
+
+[sub_resource type="RectangleShape2D" id="BC_NW"]
+size = Vector2(195, 105)
+
+[sub_resource type="RectangleShape2D" id="BC_NE"]
+size = Vector2(235, 105)
+
+[sub_resource type="RectangleShape2D" id="BC_SW"]
+size = Vector2(195, 105)
+
+[sub_resource type="RectangleShape2D" id="BC_SE"]
+size = Vector2(235, 105)
+
+[node name="CityDay" type="Node2D"]
+y_sort_enabled = true
+
+[node name="Background" type="TextureRect" parent="."]
+offset_right = 480.0
+offset_bottom = 270.0
+texture = ExtResource("3_cobble_day")
+stretch_mode = 1
+texture_repeat = 2
+z_index = -10
+
+[node name="Buildings" type="Node2D" parent="."]
+
+[node name="Block_NW" type="TextureRect" parent="Buildings"]
+offset_right = 195.0
+offset_bottom = 105.0
+texture = ExtResource("4_tenement")
+stretch_mode = 1
+texture_repeat = 2
+z_index = -1
+
+[node name="Block_NE" type="TextureRect" parent="Buildings"]
+offset_left = 245.0
+offset_right = 480.0
+offset_bottom = 105.0
+texture = ExtResource("4_tenement")
+stretch_mode = 1
+texture_repeat = 2
+z_index = -1
+
+[node name="Block_SW" type="TextureRect" parent="Buildings"]
+offset_top = 165.0
+offset_right = 195.0
+offset_bottom = 270.0
+texture = ExtResource("4_tenement")
+stretch_mode = 1
+texture_repeat = 2
+z_index = -1
+
+[node name="Block_SE" type="TextureRect" parent="Buildings"]
+offset_left = 245.0
+offset_top = 165.0
+offset_right = 480.0
+offset_bottom = 270.0
+texture = ExtResource("4_tenement")
+stretch_mode = 1
+texture_repeat = 2
+z_index = -1
+
+[node name="Props" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="TeaStall" type="Sprite2D" parent="Props"]
+position = Vector2(345, 190)
+scale = Vector2(0.063, 0.063)
+texture = ExtResource("5_chai")
+
+[node name="MunicipalOffice" type="Sprite2D" parent="Props"]
+position = Vector2(415, 55)
+scale = Vector2(0.078, 0.078)
+texture = ExtResource("6_office")
+
+[node name="MarketCart" type="Sprite2D" parent="Props"]
+position = Vector2(150, 225)
+scale = Vector2(0.063, 0.063)
+texture = ExtResource("7_market")
+
+[node name="WorldBounds" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="WallTop" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(240, -5)
+shape = SubResource("Shape_wall_top")
+
+[node name="WallLeft" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(-5, 135)
+shape = SubResource("Shape_wall_left")
+
+[node name="WallRight" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(485, 135)
+shape = SubResource("Shape_wall_right")
+
+[node name="WallBottom" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(240, 275)
+shape = SubResource("Shape_wall_bottom")
+
+[node name="BuildingColliders" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="ColNW" type="CollisionShape2D" parent="BuildingColliders"]
+position = Vector2(97, 52)
+shape = SubResource("BC_NW")
+
+[node name="ColNE" type="CollisionShape2D" parent="BuildingColliders"]
+position = Vector2(362, 52)
+shape = SubResource("BC_NE")
+
+[node name="ColSW" type="CollisionShape2D" parent="BuildingColliders"]
+position = Vector2(97, 217)
+shape = SubResource("BC_SW")
+
+[node name="ColSE" type="CollisionShape2D" parent="BuildingColliders"]
+position = Vector2(362, 217)
+shape = SubResource("BC_SE")
+
+[node name="NPCContainer" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="MrsMehta" parent="NPCContainer" instance=ExtResource("2_npc")]
+position = Vector2(180, 95)
+npc_id = "mrs_mehta"
+display_name = "Mrs. Mehta"
+world_sprite_sheet = ExtResource("9_mrs_mehta_world")
+
+[node name="Raju" parent="NPCContainer" instance=ExtResource("2_npc")]
+position = Vector2(280, 155)
+npc_id = "raju"
+display_name = "Raju"
+world_sprite_sheet = ExtResource("10_raju_world")
+
+[node name="Champa" parent="NPCContainer" instance=ExtResource("2_npc")]
+position = Vector2(340, 195)
+npc_id = "champa"
+display_name = "Champa Tai"
+world_sprite_sheet = ExtResource("11_champa_world")
+
+[node name="Desai" parent="NPCContainer" instance=ExtResource("2_npc")]
+position = Vector2(380, 120)
+npc_id = "desai"
+display_name = "Desai Sahib"
+world_sprite_sheet = ExtResource("12_desai_world")
+
+[node name="Arjun" parent="NPCContainer" instance=ExtResource("2_npc")]
+position = Vector2(100, 185)
+npc_id = "arjun"
+display_name = "Arjun"
+world_sprite_sheet = ExtResource("13_arjun_world")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(240, 135)
+world_sprite_sheet = ExtResource("8_player_world")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(240, 135)
+zoom = Vector2(1, 1)

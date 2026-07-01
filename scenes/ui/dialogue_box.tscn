@@ -1,0 +1,63 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/DialogueBox.gd" id="1_dlg"]
+
+[node name="DialogueBox" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_dlg")
+
+[node name="VoicePanel" type="PanelContainer" parent="."]
+offset_left = 8.0
+offset_top = 160.0
+offset_right = 240.0
+offset_bottom = 195.0
+modulate = Color(1, 1, 1, 0)
+
+[node name="VoiceLabel" type="RichTextLabel" parent="VoicePanel"]
+bbcode_enabled = true
+scroll_active = false
+theme_override_font_sizes/normal_font_size = 8
+theme_override_font_sizes/bold_font_size = 8
+fit_content = true
+
+[node name="Panel" type="PanelContainer" parent="."]
+offset_left = 4.0
+offset_top = 195.0
+offset_right = 476.0
+offset_bottom = 266.0
+
+[node name="HBox" type="HBoxContainer" parent="Panel"]
+theme_override_constants/separation = 6
+
+[node name="Portrait" type="TextureRect" parent="Panel/HBox"]
+custom_minimum_size = Vector2(48, 48)
+expand_mode = 1
+stretch_mode = 5
+visible = false
+
+[node name="VBox" type="VBoxContainer" parent="Panel/HBox"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="SpeakerName" type="Label" parent="Panel/HBox/VBox"]
+text = ""
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(1, 0.85, 0.5, 1)
+
+[node name="DialogueText" type="RichTextLabel" parent="Panel/HBox/VBox"]
+custom_minimum_size = Vector2(0, 40)
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_active = false
+theme_override_font_sizes/normal_font_size = 9
+fit_content = false
+
+[node name="ChoicesContainer" type="VBoxContainer" parent="Panel/HBox/VBox"]
+theme_override_constants/separation = 2
+
+[node name="AdvanceHint" type="Label" parent="Panel/HBox/VBox"]
+text = "▶  [E / Enter]"
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 1)
+visible = false

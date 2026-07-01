@@ -1,0 +1,1294 @@
+{
+  "mrs_mehta": {
+    "name": "Mrs. Mehta",
+    "title": "The Widow of Flat 4B",
+    "portrait_day": "res://assets/sprites/npcs/mrs_mehta_portrait.png",
+    "portrait_spirit": "res://assets/sprites/npcs/mrs_mehta_spirit_portrait.png",
+    "spawn_location_day": {"x": 180, "y": 95},
+    "spawn_location_night": {"x": 180, "y": 95},
+    "dialogue_trees": {
+
+      "first_meeting": {
+        "start": "m1_arrive",
+        "nodes": {
+          "m1_arrive": {
+            "speaker": "Mrs. Mehta",
+            "text": "Ah. You're early today. Your baba used to come at this time too.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "She called him 'your baba' — she knew your grandfather. The grief in her voice isn't about you.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "You knew my grandfather?", "stat_check": null, "next": "m1_knew_baba", "effects": {}},
+              {"id": "c1b", "text": "Sorry for the trouble. Here's your tiffin.", "stat_check": null, "next": "m1_just_tiffin", "effects": {}}
+            ]
+          },
+          "m1_knew_baba": {
+            "speaker": "Mrs. Mehta",
+            "text": "Forty years, your baba brought tiffin to this building. He knew everyone's order by heart. He knew my husband liked extra methi.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "Your husband — does he still live here?", "stat_check": null, "next": "m1_husband_question", "effects": {}}
+            ]
+          },
+          "m1_husband_question": {
+            "speaker": "Mrs. Mehta",
+            "text": "He did. Until three months ago.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Three months. The number people use when it's too new to say 'he passed away' casually but too old to still be crying openly.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c3a", "text": "I'm sorry. I didn't know.", "stat_check": null, "next": "m1_sorry", "effects": {"route_update": {"trust_level": 1}, "stat_modify": {"EMPATHY": 1}, "add_note": "Husband passed away 3 months ago. She knew Baba."}},
+              {"id": "c3b", "text": "[EMPATHY 2] She needs someone to sit with this, not rush past it.", "stat_check": {"skill": "EMPATHY", "threshold": 2}, "next": "m1_empathy_sit", "fail_next": "m1_sorry", "effects": {"route_update": {"trust_level": 1}, "stat_modify": {"EMPATHY": 1}, "add_note": "Husband passed away 3 months ago. She still sets out his plate."}}
+            ]
+          },
+          "m1_sorry": {
+            "speaker": "Mrs. Mehta",
+            "text": "No, no. How would you know? Come again tomorrow. I'll leave the container outside.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END",
+            "effects": {"route_update": {"day_state": 1}}
+          },
+          "m1_empathy_sit": {
+            "speaker": "Mrs. Mehta",
+            "text": "Some days I still put out two cups for tea. Muscle memory, you know? Thirty-two years.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "Thirty-two years of the same morning. She's not just grieving a person — she's grieving a whole shape of life.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c4a", "text": "That sounds... right, actually. To remember in your hands.", "stat_check": null, "next": "m1_empathy_end", "effects": {"route_update": {"day_state": 1, "trust_level": 1}, "stat_modify": {"GRIEF": 1}}}
+            ]
+          },
+          "m1_empathy_end": {
+            "speaker": "Mrs. Mehta",
+            "text": "Yes. Yes, exactly. Come again tomorrow, beta. I'll have the container ready.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "m1_just_tiffin": {
+            "speaker": "Mrs. Mehta",
+            "text": "No trouble. You're doing your family's work. That's a good thing.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END",
+            "effects": {"route_update": {"day_state": 1}}
+          }
+        }
+      },
+
+      "developing": {
+        "start": "m2_greeting",
+        "nodes": {
+          "m2_greeting": {
+            "speaker": "Mrs. Mehta",
+            "text": "I found some of his old photographs last night. I hadn't opened that box in years.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "Old paper and dried marigold. She's been going through his things.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "How was that?", "stat_check": null, "next": "m2_photos_hard", "effects": {}},
+              {"id": "c1b", "text": "[EMPATHY 2] Was there one that surprised you?", "stat_check": {"skill": "EMPATHY", "threshold": 2}, "next": "m2_photos_surprise", "fail_next": "m2_photos_hard", "effects": {}}
+            ]
+          },
+          "m2_photos_hard": {
+            "speaker": "Mrs. Mehta",
+            "text": "Hard. But also — he looked so young in them. I forgot he was ever that young.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "What was he like?", "stat_check": null, "next": "m2_husband_character", "effects": {}}
+            ]
+          },
+          "m2_photos_surprise": {
+            "speaker": "Mrs. Mehta",
+            "text": "There was one from before we were married. He's looking at the camera but his mind is somewhere else entirely. I never knew what he was thinking in that photograph. I never asked.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "The regret of the unanswered question. The thing you can no longer ask.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "That sounds like something he left behind for you to wonder about.", "stat_check": null, "next": "m2_husband_character", "effects": {"route_update": {"trust_level": 2}, "add_note": "She found an old photo — something in it she never understood. A question she can't ask anymore."}}
+            ]
+          },
+          "m2_husband_character": {
+            "speaker": "Mrs. Mehta",
+            "text": "He was stubborn. And quiet about the important things. Very quiet. I wonder now if there were things he never said.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "She's circling something. This isn't just reminiscing — she's carrying an unasked question.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c3a", "text": "Maybe he said them in other ways.", "stat_check": null, "next": "m2_end_warm", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}}},
+              {"id": "c3b", "text": "[GRIEF 1] Maybe some things are said in silences.", "stat_check": {"skill": "GRIEF", "threshold": 1}, "next": "m2_end_grief", "fail_next": "m2_end_warm", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}, "stat_modify": {"EMPATHY": 1}}}
+            ]
+          },
+          "m2_end_warm": {
+            "speaker": "Mrs. Mehta",
+            "text": "Maybe. Take the tiffin box back tomorrow when you come. I'll wash it tonight.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "m2_end_grief": {
+            "speaker": "Mrs. Mehta",
+            "text": "...Yes. I think you're right. Some things only make sense later, when you're listening differently.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "trust": {
+        "start": "m3_letter",
+        "nodes": {
+          "m3_letter": {
+            "speaker": "Mrs. Mehta",
+            "text": "I found a letter today. In his coat pocket — the one he wore to the hospital the last time. He never gave it to me.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "She's holding herself very still. This is the thing she's been building toward.", "requires_stat": 2},
+              {"skill": "GRIEF", "text": "The letter that didn't arrive. The words that never made the crossing.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "Have you read it?", "stat_check": null, "next": "m3_read_it", "effects": {}}
+            ]
+          },
+          "m3_read_it": {
+            "speaker": "Mrs. Mehta",
+            "text": "Not yet. I've been carrying it for three days. I don't know if I'm afraid he said something wonderful or something I can't bear to know.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "Either way, the letter will change things. She needs to know that's okay.", "requires_stat": 3}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Both things can be true at once.", "stat_check": null, "next": "m3_end", "effects": {}},
+              {"id": "c2b", "text": "[EMPATHY 3] Whatever it says — it's from him. That's what matters.", "stat_check": {"skill": "EMPATHY", "threshold": 3}, "next": "m3_end_empathy", "fail_next": "m3_end", "effects": {"route_update": {"trust_level": 3, "day_state": 3}, "add_note": "She found his unsent letter. She hasn't read it yet. Spirit world: the letter waits."}}
+            ]
+          },
+          "m3_end": {
+            "speaker": "Mrs. Mehta",
+            "text": "...I'll read it tonight. Come tomorrow.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END",
+            "effects": {"route_update": {"day_state": 3}}
+          },
+          "m3_end_empathy": {
+            "speaker": "Mrs. Mehta",
+            "text": "Yes. Yes. It's from him. Whatever he said — it was him saying it. That's enough.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END",
+            "effects": {"route_update": {"trust_level": 3, "day_state": 3}}
+          }
+        }
+      },
+
+      "spirit_not_ready": {
+        "start": "sn_1",
+        "nodes": {
+          "sn_1": {
+            "speaker": null,
+            "text": "A shape stands in the lantern light. She doesn't see you yet. Or perhaps she doesn't want to.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_intro": {
+        "start": "si_1",
+        "nodes": {
+          "si_1": {
+            "speaker": "NARRATOR",
+            "text": "The streets look the same, but the light falls differently here — gold through indigo, everything a little further away. She stands by the window of what used to be Flat 4B. She's holding something.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "You recognise this version of her. More transparent. The part that stays up when everything else has gone to sleep.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "Mrs. Mehta?", "stat_check": null, "next": "si_2", "effects": {}}
+            ]
+          },
+          "si_2": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "Oh. You're one of the ones who can see. Your grandfather could too, you know. He used to bring us what we needed without knowing it.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "What are you holding?", "stat_check": null, "next": "si_3", "effects": {"route_update": {"spirit_state": 1}}}
+            ]
+          },
+          "si_3": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "His letter. I've been holding it in both worlds. I still can't open it.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "She can't do it alone. That's why she's still here.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c3a", "text": "I can stay while you open it.", "stat_check": null, "next": "si_end", "effects": {}},
+              {"id": "c3b", "text": "[GRIEF 2] Some letters need a witness.", "stat_check": {"skill": "GRIEF", "threshold": 2}, "next": "si_end_grief", "fail_next": "si_end", "effects": {}}
+            ]
+          },
+          "si_end": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "Come again tomorrow night. I think I'll be ready then.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "si_end_grief": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "A witness. Yes. I never thought of it that way. Come back. Tomorrow night, I'll read it.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_resolution": {
+        "start": "sr_1",
+        "nodes": {
+          "sr_1": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "You came back. Good. I have the letter.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "She's not shaking anymore. She's decided.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "I'm here. Whenever you're ready.", "stat_check": null, "next": "sr_2", "effects": {}}
+            ]
+          },
+          "sr_2": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "'Rani — I know I am not good at saying these things while you can hear me. So I am saying it now in writing, which is easier for a coward like me. I loved the thirty-two years. Every single one. Don't be so quiet without me.'",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Oh. There it is. He knew. He just couldn't say it face to face.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "He wasn't quiet about the important things after all.", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "stat_modify": {"GRIEF": 1, "EMPATHY": 1}, "add_note": "Letter delivered. He loved the thirty-two years. She heard him, finally.", "set_flag": "mrs_mehta_resolved"}}
+            ]
+          },
+          "sr_end": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "No. He wasn't. He just needed someone to carry the words the last few steps. Thank you. Go now. I'm going to sleep.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_aftermath": {
+        "start": "sa_1",
+        "nodes": {
+          "sa_1": {
+            "speaker": "Mrs. Mehta",
+            "text": "She's standing in the light of the lanterns, and she looks — lighter. As if she set something down.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      }
+    }
+  },
+
+  "raju": {
+    "name": "Raju",
+    "title": "The Boy on the Temple Steps",
+    "portrait_day": "res://assets/sprites/npcs/raju_portrait.png",
+    "portrait_spirit": "res://assets/sprites/npcs/raju_spirit_portrait.png",
+    "spawn_location_day": {"x": 280, "y": 160},
+    "spawn_location_night": {"x": 280, "y": 160},
+    "dialogue_trees": {
+
+      "first_meeting": {
+        "start": "r1_caught",
+        "nodes": {
+          "r1_caught": {
+            "speaker": "Raju",
+            "text": "I didn't take anything. I was just... smelling it. The tiffin.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "He's lying. The tiffin on the bottom of the stack is lighter than it should be. One container is nearly empty.", "requires_stat": 1},
+              {"skill": "STREET_SENSE", "text": "Dirty sneakers, school bag, uniform three days unwashed. He's not homeless — he's run away.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "You're hungry. That's all right.", "stat_check": null, "next": "r1_generous", "effects": {"stat_modify": {"EMPATHY": 1}}},
+              {"id": "c1b", "text": "[NOSE 1] I can see the container is empty. Who taught you to eat so quietly?", "stat_check": {"skill": "NOSE", "threshold": 1}, "next": "r1_caught_gentle", "fail_next": "r1_generous", "effects": {}},
+              {"id": "c1c", "text": "That tiffin was for Flat 2A.", "stat_check": null, "next": "r1_strict", "effects": {}}
+            ]
+          },
+          "r1_generous": {
+            "speaker": "Raju",
+            "text": "I'll pay you back. I have money at home.",
+            "voice_interjections": [
+              {"skill": "STREET_SENSE", "text": "He said 'at home' not 'I don't have money.' He has a home. He just isn't in it.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Don't worry about it. I'll bring extra tomorrow.", "stat_check": null, "next": "r1_end_warm", "effects": {"route_update": {"day_state": 1, "trust_level": 1}, "add_note": "He's a runaway, not homeless. Has a home. Too proud to say more."}}
+            ]
+          },
+          "r1_caught_gentle": {
+            "speaker": "Raju",
+            "text": "...My ammi taught me. She said eating quietly was polite. I was trying to put it back before you noticed.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "Your ammi sounds like a careful person. I'll bring you your own tomorrow.", "stat_check": null, "next": "r1_end_warm", "effects": {"route_update": {"day_state": 1, "trust_level": 2}, "add_note": "His mother taught him to eat quietly. He's been here a few days."}}
+            ]
+          },
+          "r1_strict": {
+            "speaker": "Raju",
+            "text": "Sorry. Sorry, I'll go.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "Wait — are you all right?", "stat_check": null, "next": "r1_end_warm", "effects": {"route_update": {"day_state": 1}}}
+            ]
+          },
+          "r1_end_warm": {
+            "speaker": "Raju",
+            "text": "I'm fine. I'm just... between things right now.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "developing": {
+        "start": "r2_start",
+        "nodes": {
+          "r2_start": {
+            "speaker": "Raju",
+            "text": "You came back. With extra.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "I said I would. How long have you been sleeping here?", "stat_check": null, "next": "r2_how_long", "effects": {}}
+            ]
+          },
+          "r2_how_long": {
+            "speaker": "Raju",
+            "text": "Nine days. But I'm not sleeping here. I'm thinking.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "That distinction matters to him. He's not running — in his mind, he's making a decision.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Nine days is a long time to think.", "stat_check": null, "next": "r2_why_left", "effects": {}},
+              {"id": "c2b", "text": "[STREET_SENSE 2] What are you thinking about?", "stat_check": {"skill": "STREET_SENSE", "threshold": 2}, "next": "r2_why_left_direct", "fail_next": "r2_why_left", "effects": {}}
+            ]
+          },
+          "r2_why_left": {
+            "speaker": "Raju",
+            "text": "They sent me to this boarding school. To get a good future. But I was the only boy from here. Nobody talked to me like — like I was from anywhere.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Loneliness as a form of erasure. He left to find himself and ended up more lost.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c3a", "text": "So you left.", "stat_check": null, "next": "r2_end", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}, "add_note": "Ran from boarding school. Felt invisible, erased. Has a family waiting."}},
+              {"id": "c3b", "text": "[EMPATHY 2] And now nobody knows where you are.", "stat_check": {"skill": "EMPATHY", "threshold": 2}, "next": "r2_end_empathy", "fail_next": "r2_end", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}, "stat_modify": {"EMPATHY": 1}}}
+            ]
+          },
+          "r2_why_left_direct": {
+            "speaker": "Raju",
+            "text": "I'm thinking about whether going home means I lost. Or whether I was allowed to want to come home.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c3a", "text": "Wanting to go home doesn't make you a loser.", "stat_check": null, "next": "r2_end", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}, "add_note": "He thinks going home = admitting defeat. Pride vs longing."}}
+            ]
+          },
+          "r2_end": {
+            "speaker": "Raju",
+            "text": "...Yeah. I left. I don't know if I want to go back.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "r2_end_empathy": {
+            "speaker": "Raju",
+            "text": "My ammi doesn't know. My baba will be so angry. He saved for two years for that school.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "trust": {
+        "start": "r3_phone",
+        "nodes": {
+          "r3_phone": {
+            "speaker": "Raju",
+            "text": "I borrowed a phone from the chai man. To call home. I stood there for four minutes and then I gave it back.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He dialled and couldn't do it. The pride and the longing are equally strong.", "requires_stat": 2},
+              {"skill": "GRIEF", "text": "Four minutes is a long time to hold a phone and decide not to speak.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "What stopped you?", "stat_check": null, "next": "r3_stopped", "effects": {}}
+            ]
+          },
+          "r3_stopped": {
+            "speaker": "Raju",
+            "text": "I didn't know what to say after 'hello.' Everything after 'hello' would have to be an explanation.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "'Hello' might be enough.", "stat_check": null, "next": "r3_end", "effects": {"route_update": {"trust_level": 2, "day_state": 3}}},
+              {"id": "c2b", "text": "[STREET_SENSE 2] They already know you're coming home. They're just waiting for the call.", "stat_check": {"skill": "STREET_SENSE", "threshold": 2}, "next": "r3_end_sense", "fail_next": "r3_end", "effects": {"route_update": {"trust_level": 3, "day_state": 3}, "add_note": "He needs courage to call. The words 'hello' are the whole door."}}
+            ]
+          },
+          "r3_end": {
+            "speaker": "Raju",
+            "text": "Maybe. I'll think about it.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "r3_end_sense": {
+            "speaker": "Raju",
+            "text": "How do you know that?",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c3a", "text": "Because you're their son. You could call ten years later and they'd pick up.", "stat_check": null, "next": "r3_end_final", "effects": {}}
+            ]
+          },
+          "r3_end_final": {
+            "speaker": "Raju",
+            "text": "...",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He's crying. Very quietly. Like someone who was taught to eat quietly.", "requires_stat": 2}
+            ],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_not_ready": {
+        "start": "sn_1",
+        "nodes": {
+          "sn_1": {
+            "speaker": null,
+            "text": "A small shape sits on the spirit-steps. He's holding something small and luminous — you can't tell what it is yet.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_intro": {
+        "start": "si_1",
+        "nodes": {
+          "si_1": {
+            "speaker": "Spirit — Raju",
+            "text": "You can see me here too. I wondered if you would.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "What are you holding?", "stat_check": null, "next": "si_2", "effects": {"route_update": {"spirit_state": 1}}}
+            ]
+          },
+          "si_2": {
+            "speaker": "Spirit — Raju",
+            "text": "A phone. But here it doesn't ring. I've been carrying the call I didn't make.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "The unmade call is heavier than any call you make. It lives in the gap.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Can I deliver it for you?", "stat_check": null, "next": "si_end", "effects": {}}
+            ]
+          },
+          "si_end": {
+            "speaker": "Spirit — Raju",
+            "text": "You can't call for me. But maybe you can show me how it goes. Come back tomorrow.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_resolution": {
+        "start": "sr_1",
+        "nodes": {
+          "sr_1": {
+            "speaker": "Spirit — Raju",
+            "text": "I'm ready to call. I just need — I need to hear myself do it. Can you be here?",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "I'm here. Say 'hello.'", "stat_check": null, "next": "sr_2", "effects": {}}
+            ]
+          },
+          "sr_2": {
+            "speaker": "Spirit — Raju",
+            "text": "...Hello? Ammi? It's me. ...Yes. Yes, I know. I'm coming home.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "There it is. The whole weight of nine days in four words.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "(Say nothing. Let him have this.)", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flag": "raju_resolved", "add_note": "He made the call. He's going home.", "stat_modify": {"EMPATHY": 1}}}
+            ]
+          },
+          "sr_end": {
+            "speaker": "Spirit — Raju",
+            "text": "The phone vanished. I think — I think it worked. Go. I'm going to go find a real phone now.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_aftermath": {
+        "start": "sa_1",
+        "nodes": {
+          "sa_1": {
+            "speaker": null,
+            "text": "The steps are empty. He's gone home.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      }
+    }
+  },
+
+  "desai": {
+    "name": "Desai Sahib",
+    "title": "The Clerk at Window 3",
+    "portrait_day": "res://assets/sprites/npcs/desai_portrait.png",
+    "portrait_spirit": "res://assets/sprites/npcs/desai_spirit_portrait.png",
+    "spawn_location_day": {"x": 380, "y": 120},
+    "spawn_location_night": {"x": 380, "y": 120},
+    "dialogue_trees": {
+
+      "first_meeting": {
+        "start": "d1_start",
+        "nodes": {
+          "d1_start": {
+            "speaker": "Desai Sahib",
+            "text": "New delivery person, hah? Your parking permit is not valid for this lane. I can overlook it... for a consideration.",
+            "voice_interjections": [
+              {"skill": "STREET_SENSE", "text": "Standard shakedown. But his hands are shaking too. The villain in this scene is tired.", "requires_stat": 1},
+              {"skill": "NOSE", "text": "Hospital disinfectant under the sweat. He came from somewhere before work.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "How much of a consideration?", "stat_check": null, "next": "d1_bribe", "effects": {}},
+              {"id": "c1b", "text": "[NOSE 2] You smell like Nair Hospital. Long morning?", "stat_check": {"skill": "NOSE", "threshold": 2}, "next": "d1_hospital", "fail_next": "d1_bribe", "effects": {}},
+              {"id": "c1c", "text": "I'll move the bicycle.", "stat_check": null, "next": "d1_leave", "effects": {}}
+            ]
+          },
+          "d1_bribe": {
+            "speaker": "Desai Sahib",
+            "text": "One hundred rupees. And you can come and go freely.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "(Pay it. It's easier.)", "stat_check": null, "next": "d1_paid", "effects": {"route_update": {"day_state": 1}, "add_note": "Took a small bribe. Tired, not cruel."}},
+              {"id": "c2b", "text": "I don't have it today. I'll bring it tomorrow.", "stat_check": null, "next": "d1_defer", "effects": {"route_update": {"day_state": 1}}}
+            ]
+          },
+          "d1_hospital": {
+            "speaker": "Desai Sahib",
+            "text": "...What? I don't— yes. I had an appointment. Never mind that.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He flinched. That question landed somewhere real.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "I hope it was a good appointment.", "stat_check": null, "next": "d1_hospital_soft", "effects": {"route_update": {"day_state": 1, "trust_level": 1, "unlocked": true}, "add_note": "Goes to Nair Hospital. Won't say why. The extortion softened when I mentioned it."}}
+            ]
+          },
+          "d1_hospital_soft": {
+            "speaker": "Desai Sahib",
+            "text": "...Move your bicycle out of Window 3's eyeline. Window 4 is fine. Go.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "d1_paid": {
+            "speaker": "Desai Sahib",
+            "text": "Tomorrow, same time, it lapses. Good day.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "d1_defer": {
+            "speaker": "Desai Sahib",
+            "text": "Tomorrow then. Don't make me come looking.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "d1_leave": {
+            "speaker": "Desai Sahib",
+            "text": "Good. See you don't forget.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END",
+            "effects": {"route_update": {"day_state": 1}}
+          }
+        }
+      },
+
+      "developing": {
+        "start": "d2_start",
+        "nodes": {
+          "d2_start": {
+            "speaker": "Desai Sahib",
+            "text": "You again. You're consistent. I'll give you that.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "Hospital again. More than an appointment. This is routine.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "I brought you your tiffin. New route — you're on the list now.", "stat_check": null, "next": "d2_tiffin", "effects": {}},
+              {"id": "c1b", "text": "[NOSE 2] Nair Hospital again today?", "stat_check": {"skill": "NOSE", "threshold": 2}, "next": "d2_hospital_again", "fail_next": "d2_tiffin", "effects": {}}
+            ]
+          },
+          "d2_tiffin": {
+            "speaker": "Desai Sahib",
+            "text": "I didn't ask to be on a list.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "I know. It's a gift. First one's free.", "stat_check": null, "next": "d2_end_tiffin", "effects": {"route_update": {"day_state": 2, "trust_level": 1}}}
+            ]
+          },
+          "d2_hospital_again": {
+            "speaker": "Desai Sahib",
+            "text": "My wife. She's been — she has her treatments on Tuesdays and Fridays.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He said it quietly. The way people say things they've had to say too many times to cry over anymore.", "requires_stat": 2},
+              {"skill": "GRIEF", "text": "He's not angry with you. He's angry with something much larger and taking it out on people at his eye level.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "I'm sorry. That's a hard schedule to carry.", "stat_check": null, "next": "d2_wife_reveal", "effects": {"route_update": {"day_state": 2, "trust_level": 2, "spirit_unlocked": true}, "add_note": "Wife is ill. Treatments Tuesdays and Fridays at Nair Hospital. The bribes are funding it."}}
+            ]
+          },
+          "d2_wife_reveal": {
+            "speaker": "Desai Sahib",
+            "text": "It is what it is. Don't — don't tell anyone. This is not your business.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "It won't leave this lane.", "stat_check": null, "next": "d2_end_trust", "effects": {}}
+            ]
+          },
+          "d2_end_trust": {
+            "speaker": "Desai Sahib",
+            "text": "...Leave the tiffin. And come from Window 4 side tomorrow. I'll tell them you're expected.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "d2_end_tiffin": {
+            "speaker": "Desai Sahib",
+            "text": "...Fine. First one. Leave it.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "trust": {
+        "start": "d3_confession",
+        "nodes": {
+          "d3_confession": {
+            "speaker": "Desai Sahib",
+            "text": "I've been thinking. What I take from the department — for her treatments. I know what it is. I've known for two years.",
+            "voice_interjections": [
+              {"skill": "STREET_SENSE", "text": "He didn't just decide to confess. He needed someone who already knew the right amount — not everything, enough.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "Why are you telling me this?", "stat_check": null, "next": "d3_why", "effects": {}}
+            ]
+          },
+          "d3_why": {
+            "speaker": "Desai Sahib",
+            "text": "Because you're the only person who brings me food and doesn't want something from me. That's — that means something, strangely.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "Is there another way to fund the treatments?", "stat_check": null, "next": "d3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "add_note": "He confessed the source of the bribes. Wife's medical costs. Wants a way out."}},
+              {"id": "c2b", "text": "[EMPATHY 3] You've been alone with this for two years.", "stat_check": {"skill": "EMPATHY", "threshold": 3}, "next": "d3_end_empathy", "fail_next": "d3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "stat_modify": {"EMPATHY": 1}}}
+            ]
+          },
+          "d3_end": {
+            "speaker": "Desai Sahib",
+            "text": "I'm looking into it. There are government schemes I should have applied for. I was too — too proud. Or too frightened.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "d3_end_empathy": {
+            "speaker": "Desai Sahib",
+            "text": "Two years, four months, and eleven days. I counted.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_not_ready": {
+        "start": "sn_1",
+        "nodes": {
+          "sn_1": {
+            "speaker": null,
+            "text": "A figure in a government uniform stands very still. He's surrounded by floating papers. They won't stop moving.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_intro": {
+        "start": "si_1",
+        "nodes": {
+          "si_1": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "The papers won't stop. Every one of them is a form I filled wrong. Or filled right for the wrong reason.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "What would make them stop?", "stat_check": null, "next": "si_2", "effects": {"route_update": {"spirit_state": 1}}}
+            ]
+          },
+          "si_2": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "I don't know. The form I actually need to fill — the right one — I can never find it.",
+            "voice_interjections": [
+              {"skill": "STREET_SENSE", "text": "He's looking for a legitimate path. One he should have taken. That's what he needs delivered.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Maybe I can find it for you.", "stat_check": null, "next": "si_end", "effects": {}}
+            ]
+          },
+          "si_end": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "You would do that. Come back.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_resolution": {
+        "start": "sr_1",
+        "nodes": {
+          "sr_1": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "You found it?",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "PM-JAY. National health scheme. She qualifies. You qualify. You always did.", "stat_check": null, "next": "sr_2", "effects": {}}
+            ]
+          },
+          "sr_2": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "...I knew about PM-JAY. I never applied because applying meant I was admitting I couldn't afford it myself.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Pride as its own kind of poverty. He couldn't bear the paperwork of needing help.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Applying means you love her more than you need to seem fine.", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flag": "desai_resolved", "add_note": "Spirit delivered: the form he never filled. PM-JAY. He needed permission to need help.", "stat_modify": {"GRIEF": 1}}}
+            ]
+          },
+          "sr_end": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "The papers have stopped. ...I'll fill it in the morning. The real one.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_aftermath": {
+        "start": "sa_1",
+        "nodes": {
+          "sa_1": {
+            "speaker": null,
+            "text": "The papers are gone. He's standing in clear air for the first time in what must feel like years.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      }
+    }
+  },
+
+  "arjun": {
+    "name": "Arjun",
+    "title": "The Son Who Came Back",
+    "portrait_day": "res://assets/sprites/npcs/arjun_portrait.png",
+    "portrait_spirit": "res://assets/sprites/npcs/arjun_spirit_portrait.png",
+    "spawn_location_day": {"x": 100, "y": 180},
+    "spawn_location_night": {"x": 100, "y": 180},
+    "dialogue_trees": {
+
+      "first_meeting": {
+        "start": "a1_new",
+        "nodes": {
+          "a1_new": {
+            "speaker": "Arjun",
+            "text": "New address. I just moved back. My father lives here — I'll be staying for a while.",
+            "voice_interjections": [
+              {"skill": "STREET_SENSE", "text": "New to this address, but not new to this city. He knows how to stand on these streets. He grew up here.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "Welcome back. Two portions?", "stat_check": null, "next": "a1_two_portions", "effects": {}},
+              {"id": "c1b", "text": "How long have you been away?", "stat_check": null, "next": "a1_away", "effects": {}}
+            ]
+          },
+          "a1_two_portions": {
+            "speaker": "Arjun",
+            "text": "One. He doesn't eat much. And I'm not sure he'll eat at all if I'm the one who ordered it.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "Something happened between them. He came back anyway. That means something.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "I'll bring two anyway. He might surprise you.", "stat_check": null, "next": "a1_end", "effects": {"route_update": {"day_state": 1, "trust_level": 1, "unlocked": true}, "add_note": "Returned from abroad. Complicated relationship with his father. Father may not accept food."}}
+            ]
+          },
+          "a1_away": {
+            "speaker": "Arjun",
+            "text": "Eight years. I was in Canada. I came back when my father's health started — well. I came back.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "He stopped himself from finishing that sentence. Whatever he came back for, it's complicated by grief.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "That's a long time. And a long way.", "stat_check": null, "next": "a1_end", "effects": {"route_update": {"day_state": 1, "unlocked": true}}}
+            ]
+          },
+          "a1_end": {
+            "speaker": "Arjun",
+            "text": "Yes. Well. Leave the tiffin at the door. We'll... sort it out.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "developing": {
+        "start": "a2_start",
+        "nodes": {
+          "a2_start": {
+            "speaker": "Arjun",
+            "text": "He ate from the tiffin. He didn't say anything about it. But he ate.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "The container you're collecting smells of the same sabzi you've been sending. He ate exactly his portion and no more. Neither wasteful nor reaching for seconds — the discipline of a man sitting with his pride.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "That's something.", "stat_check": null, "next": "a2_that_something", "effects": {}}
+            ]
+          },
+          "a2_that_something": {
+            "speaker": "Arjun",
+            "text": "My mother used to say that with him. 'It's something. Take it.' She was very good at reading the space between what he said and what he meant.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Past tense. She's gone.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Your mother — she passed?", "stat_check": null, "next": "a2_mother", "effects": {}}
+            ]
+          },
+          "a2_mother": {
+            "speaker": "Arjun",
+            "text": "Six years ago. I didn't come back for the funeral. I told myself I couldn't afford the flight. That was — it wasn't true.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He's carrying this like a stone he can't put down.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Does your father know you wanted to come?", "stat_check": null, "next": "a2_father_knows", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}, "add_note": "Wasn't at mother's funeral 6 years ago. His reason was a lie. Father doesn't know he wanted to come."}},
+              {"id": "c2b", "text": "[GRIEF 1] That kind of regret doesn't have a name in English.", "stat_check": {"skill": "GRIEF", "threshold": 1}, "next": "a2_grief_response", "fail_next": "a2_father_knows", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}}}
+            ]
+          },
+          "a2_father_knows": {
+            "speaker": "Arjun",
+            "text": "No. He thinks I didn't care. I've let him think that for six years.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "a2_grief_response": {
+            "speaker": "Arjun",
+            "text": "No. In Hindi either. I've looked.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "trust": {
+        "start": "a3_start",
+        "nodes": {
+          "a3_start": {
+            "speaker": "Arjun",
+            "text": "I tried to talk to him last night. About Amma. He left the room.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "He's not ready yet?", "stat_check": null, "next": "a3_ready", "effects": {}},
+              {"id": "c1b", "text": "[EMPATHY 2] Or maybe he's too ready — he's been sitting with it alone for six years.", "stat_check": {"skill": "EMPATHY", "threshold": 2}, "next": "a3_empathy", "fail_next": "a3_ready", "effects": {}}
+            ]
+          },
+          "a3_ready": {
+            "speaker": "Arjun",
+            "text": "Maybe. Or maybe I said it wrong. I don't know how to talk to him anymore. I forgot the language, somehow.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "Maybe the language was always actions, not words.", "stat_check": null, "next": "a3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 2}}}
+            ]
+          },
+          "a3_empathy": {
+            "speaker": "Arjun",
+            "text": "...Both of us have been sitting alone with it. That's — I hadn't thought of it that way. He lost her too.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "The door between you is the same door. Just approach from the other side.", "stat_check": null, "next": "a3_end_empathy", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "add_note": "The door is the same door — father and son both standing at opposite sides."}}
+            ]
+          },
+          "a3_end": {
+            "speaker": "Arjun",
+            "text": "He used to come fix things in my room without asking. I hated it. Now I'd give anything to hear him puttering around.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "a3_end_empathy": {
+            "speaker": "Arjun",
+            "text": "The same door. ...I'll try again tonight.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_not_ready": {
+        "start": "sn_1",
+        "nodes": {
+          "sn_1": {
+            "speaker": null,
+            "text": "A figure stands before a door that won't open. He's been knocking for a long time.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_intro": {
+        "start": "si_1",
+        "nodes": {
+          "si_1": {
+            "speaker": "Spirit — Arjun",
+            "text": "I've been standing here for six years. The door looks like our house. But it won't open.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "What would open it?", "stat_check": null, "next": "si_2", "effects": {"route_update": {"spirit_state": 1}}}
+            ]
+          },
+          "si_2": {
+            "speaker": "Spirit — Arjun",
+            "text": "Saying the thing I never said. But I can't say it until he hears it.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He needs the door to open from the inside. Someone on the other side has to be listening.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Say it to me. I'll carry it to him.", "stat_check": null, "next": "si_end", "effects": {}}
+            ]
+          },
+          "si_end": {
+            "speaker": "Spirit — Arjun",
+            "text": "Come back. I need a little more time to find the words.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_resolution": {
+        "start": "sr_1",
+        "nodes": {
+          "sr_1": {
+            "speaker": "Spirit — Arjun",
+            "text": "I found the words. I want to say them and I want you to deliver them.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "I'm ready.", "stat_check": null, "next": "sr_2", "effects": {}}
+            ]
+          },
+          "sr_2": {
+            "speaker": "Spirit — Arjun",
+            "text": "Tell him: I was a coward, Pitaji. I was afraid you'd see how sorry I was. I came back because I'm done being afraid of you seeing me.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "The truth that was too heavy to carry alone. Now it has wheels.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "(Carry the words to Pitaji's door in the spirit-world.)", "stat_check": null, "next": "sr_3", "effects": {}}
+            ]
+          },
+          "sr_3": {
+            "speaker": "NARRATOR",
+            "text": "You walk to the other side of the door. On this side, an old man in the spirit-city. He heard. He was always on the other side, also waiting.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c3a", "text": "(The door opens.)", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flag": "arjun_resolved", "add_note": "The door opened. Both men were waiting on opposite sides.", "stat_modify": {"GRIEF": 1, "EMPATHY": 1}}}
+            ]
+          },
+          "sr_end": {
+            "speaker": "Spirit — Arjun",
+            "text": "Oh. ...Oh. He was right there.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_aftermath": {
+        "start": "sa_1",
+        "nodes": {
+          "sa_1": {
+            "speaker": null,
+            "text": "The door stands open. Both of them are inside.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      }
+    }
+  },
+
+  "champa": {
+    "name": "Champa Tai",
+    "title": "The Tea Stall at the Corner",
+    "portrait_day": "res://assets/sprites/npcs/champa_portrait.png",
+    "portrait_spirit": "res://assets/sprites/npcs/champa_spirit_portrait.png",
+    "spawn_location_day": {"x": 340, "y": 200},
+    "spawn_location_night": {"x": 340, "y": 200},
+    "dialogue_trees": {
+
+      "first_meeting": {
+        "start": "c1_intro",
+        "nodes": {
+          "c1_intro": {
+            "speaker": "Champa Tai",
+            "text": "Arre, you're Babulal's grandchild! You look just like him. Sit, sit — have chai first, tiffin second.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "Cardamom, ginger, and two types of tea leaf. She doesn't cut corners. This stall has standards.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "You knew my grandfather?", "stat_check": null, "next": "c1_grandpa", "effects": {}},
+              {"id": "c1b", "text": "I shouldn't stop — I have deliveries.", "stat_check": null, "next": "c1_busy", "effects": {}}
+            ]
+          },
+          "c1_grandpa": {
+            "speaker": "Champa Tai",
+            "text": "Twenty-five years I've had this stall. He stopped here every morning. Never took sugar. Said it confused the taste.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "That sounds like him.", "stat_check": null, "next": "c1_end_warm", "effects": {"route_update": {"day_state": 1, "trust_level": 1}, "add_note": "25 years at this stall. Knew Baba well. He took chai without sugar."}}
+            ]
+          },
+          "c1_busy": {
+            "speaker": "Champa Tai",
+            "text": "Five minutes. The chai is already poured. Your grandfather never said no to chai.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "(Sit down.)", "stat_check": null, "next": "c1_end_warm", "effects": {"route_update": {"day_state": 1, "trust_level": 1}}}
+            ]
+          },
+          "c1_end_warm": {
+            "speaker": "Champa Tai",
+            "text": "Come every day. I know everyone's business and I'll tell you none of it. But I'll give you the right chai for whatever mood you're in.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "developing": {
+        "start": "c2_homesick",
+        "nodes": {
+          "c2_homesick": {
+            "speaker": "Champa Tai",
+            "text": "Baba — sorry, I keep calling you that — something in your chai today? It tastes different to me.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "She's not talking about the chai. Something in her mood changed the flavour of the whole interaction.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "It tastes the same to me. Why different to you?", "stat_check": null, "next": "c2_why_diff", "effects": {}},
+              {"id": "c1b", "text": "[NOSE 2] It's not the chai. What's different today?", "stat_check": {"skill": "NOSE", "threshold": 2}, "next": "c2_nose_direct", "fail_next": "c2_why_diff", "effects": {}}
+            ]
+          },
+          "c2_why_diff": {
+            "speaker": "Champa Tai",
+            "text": "My sister called from the village this morning. My mother's mango tree finally died. It was forty years old.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Forty years. The tree she grew up with. The one whose shade held her whole childhood.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Did you plant it?", "stat_check": null, "next": "c2_tree", "effects": {}}
+            ]
+          },
+          "c2_nose_direct": {
+            "speaker": "Champa Tai",
+            "text": "Ayo, clever one. My mother's mango tree. Forty years. Gone this morning.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c2a", "text": "Forty years is a long life for a tree.", "stat_check": null, "next": "c2_tree", "effects": {}}
+            ]
+          },
+          "c2_tree": {
+            "speaker": "Champa Tai",
+            "text": "My father planted it the year I was born. I climbed it every summer. The last time I was home was fourteen years ago.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "The tree is a calendar of everything she hasn't gone back to.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c3a", "text": "Do you miss home?", "stat_check": null, "next": "c2_miss_home", "effects": {"route_update": {"day_state": 2, "spirit_unlocked": true}, "add_note": "Hasn't been home in 14 years. Mother's mango tree died. Her village is a ghost she carries."}}
+            ]
+          },
+          "c2_miss_home": {
+            "speaker": "Champa Tai",
+            "text": "I made this city my home. That was the deal I made with myself when I came at twenty-two. But sometimes... sometimes the old home doesn't care about your deal.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "trust": {
+        "start": "c3_train",
+        "nodes": {
+          "c3_train": {
+            "speaker": "Champa Tai",
+            "text": "I bought a train ticket last week. To go home. I've been carrying it in my apron every day. I haven't booked the time off.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "The ticket is a promise she made to herself. The time-off is the part that makes it real.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "What's stopping you from booking it?", "stat_check": null, "next": "c3_fear", "effects": {}}
+            ]
+          },
+          "c3_fear": {
+            "speaker": "Champa Tai",
+            "text": "If I go home, I might not want to come back. And this stall — these people — this is also my home now. I don't know how to hold both.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "The terror of the divided self. She belongs to both places and fully to neither.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "You won't have to choose. Both can be real.", "stat_check": null, "next": "c3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "add_note": "Holding a train ticket. Afraid that going home means leaving here. Needs permission to hold both."}},
+              {"id": "c2b", "text": "[EMPATHY 2] This place became home because of what you put into it. That won't disappear if you leave for two weeks.", "stat_check": {"skill": "EMPATHY", "threshold": 2}, "next": "c3_end_empathy", "fail_next": "c3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "stat_modify": {"EMPATHY": 1}}}
+            ]
+          },
+          "c3_end": {
+            "speaker": "Champa Tai",
+            "text": "Both can be real. I'll think about that.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "c3_end_empathy": {
+            "speaker": "Champa Tai",
+            "text": "Twenty-five years I've been here. The regulars know my schedule. The stall knows my hands. You're right — it won't forget me in two weeks.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_not_ready": {
+        "start": "sn_1",
+        "nodes": {
+          "sn_1": {
+            "speaker": null,
+            "text": "The tea stall glows in the lantern-light. A woman stands between two directions, as if she can't remember which way she's facing.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_intro": {
+        "start": "si_1",
+        "nodes": {
+          "si_1": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "Ah. The delivery boy who sees. Sit. I don't have real chai here but sit anyway.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "You're between two places here too.", "stat_check": null, "next": "si_2", "effects": {"route_update": {"spirit_state": 1}}}
+            ]
+          },
+          "si_2": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "I'm always between two places. Here in this city-dream, I can see both at once. The mango tree. This stall corner. They're the same distance.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "She's closer to peace than she thinks. She just needs someone to witness the distance and say it's okay.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "What do you need delivered?", "stat_check": null, "next": "si_end", "effects": {}}
+            ]
+          },
+          "si_end": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "Permission. I need someone to tell me I'm allowed to be from two places. Come back, beta.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_resolution": {
+        "start": "sr_1",
+        "nodes": {
+          "sr_1": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "You came back. You have it?",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c1a", "text": "You are allowed to be from two places. Both are real. Both are yours.", "stat_check": null, "next": "sr_2", "effects": {}}
+            ]
+          },
+          "sr_2": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "Both are mine. ...Yes. Yes, that's right. The mango tree is dead but I remember it and that means it's still mine. And this corner is mine. And I can go home and come back and it will all still be mine.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Grief that finds its shape. Not an ending — a belonging that spans distance.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "Go home, Champa Tai. We'll hold the stall.", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flag": "champa_resolved", "add_note": "Delivered permission to belong to both places. She's going home.", "stat_modify": {"GRIEF": 1}}}
+            ]
+          },
+          "sr_end": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "Ha! You have no idea how to run a stall. But yes. I'm going. I'll bring back good mangoes.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "spirit_aftermath": {
+        "start": "sa_1",
+        "nodes": {
+          "sa_1": {
+            "speaker": null,
+            "text": "The stall is still there, glowing warmly. A handwritten note: 'Back in two weeks. Kettle is on the left.'",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      }
+    }
+  }
+}

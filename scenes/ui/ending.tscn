@@ -1,0 +1,67 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/Ending.gd" id="1_ending"]
+
+[node name="Ending" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_ending")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.05, 0.12, 1)
+
+[node name="Panel" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -96.0
+offset_right = 180.0
+offset_bottom = 96.0
+theme_override_constants/separation = 10
+
+[node name="Heading" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.87, 0.55, 1)
+theme_override_font_sizes/font_size = 22
+text = "Every route, walked to its end."
+horizontal_alignment = 1
+
+[node name="Body" type="RichTextLabel" parent="Panel/VBox"]
+custom_minimum_size = Vector2(360, 110)
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+theme_override_colors/default_color = Color(0.9, 0.86, 0.8, 1)
+theme_override_font_sizes/normal_font_size = 11
+text = "[center]Five spirits lingered over unfinished things.
+You carried warm tiffins through day and dusk,
+listened, remembered, and set each one at rest.
+
+The stalls will open again tomorrow —
+but tonight, the streets are quiet, and grateful.
+
+[i]Thank you for walking the Tiffin Route.[/i][/center]"
+
+[node name="ToTitleButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(160, 26)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 12
+text = "Return to Title"

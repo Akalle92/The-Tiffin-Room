@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/Player.gd" id="1_player"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/player_world.png" id="2_player_world"]
+
+[sub_resource type="RectangleShape2D" id="PlayerShape"]
+size = Vector2(8, 8)
+
+[sub_resource type="RectangleShape2D" id="InteractShape"]
+size = Vector2(24, 24)
+
+[node name="Player" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_player")
+world_sprite_sheet = ExtResource("2_player_world")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -4)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("PlayerShape")
+
+[node name="InteractionArea" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea"]
+position = Vector2(0, 0)
+shape = SubResource("InteractShape")

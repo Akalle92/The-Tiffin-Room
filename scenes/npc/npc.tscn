@@ -1,0 +1,44 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/npc/NPC.gd" id="1_npc"]
+
+[sub_resource type="RectangleShape2D" id="NPCShape"]
+size = Vector2(10, 10)
+
+[sub_resource type="CircleShape2D" id="InteractShape"]
+radius = 18.0
+
+[node name="NPC" type="StaticBody2D"]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_npc")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("NPCShape")
+
+[node name="NameLabel" type="Label" parent="."]
+offset_left = -24.0
+offset_top = -32.0
+offset_right = 24.0
+offset_bottom = -20.0
+horizontal_alignment = 1
+vertical_alignment = 1
+label_settings = null
+theme_override_font_sizes/font_size = 7
+
+[node name="InteractionArea" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 4
+monitoring = true
+monitorable = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea"]
+shape = SubResource("InteractShape")
+
+[node name="DeliveryMarker" type="Sprite2D" parent="."]
+position = Vector2(0, -32)
+visible = false
