@@ -212,7 +212,18 @@
             "text": "Oh. You're one of the ones who can see. Your grandfather could too, you know. He used to bring us what we needed without knowing it.",
             "voice_interjections": [],
             "choices": [
-              {"id": "c2a", "text": "What are you holding?", "stat_check": null, "next": "si_3", "effects": {"route_update": {"spirit_state": 1}}}
+              {"id": "c2a", "text": "What are you holding?", "stat_check": null, "next": "si_3", "effects": {"route_update": {"spirit_state": 1}}},
+              {"id": "c2b", "text": "Did Baba ever have something he couldn't deliver?", "stat_check": null, "next": "si_mehta_baba", "effects": {"route_update": {"spirit_state": 1}}}
+            ]
+          },
+          "si_mehta_baba": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "Only once, he told me. He said in forty years he feared just one delivery — his own last one. To you. He never could work out how to hand it over.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He carried the very silence you've spent this whole route teaching other people to break.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c2c", "text": "...Thank you for telling me.", "stat_check": null, "next": "si_3", "effects": {"set_flag": "babulal_mehta_seed", "add_note": "Baba feared only one delivery in forty years: his own last one, to me."}}
             ]
           },
           "si_3": {
@@ -1088,7 +1099,17 @@
             "text": "Twenty-five years I've had this stall. He stopped here every morning. Never took sugar. Said it confused the taste.",
             "voice_interjections": [],
             "choices": [
-              {"id": "c2a", "text": "That sounds like him.", "stat_check": null, "next": "c1_end_warm", "effects": {"route_update": {"day_state": 1, "trust_level": 1}, "add_note": "25 years at this stall. Knew Baba well. He took chai without sugar."}}
+              {"id": "c2a", "text": "That sounds like him.", "stat_check": null, "next": "c1_babulal_seed", "effects": {"route_update": {"day_state": 1, "trust_level": 1}, "add_note": "25 years at this stall. Knew Baba well. He took chai without sugar."}}
+            ]
+          },
+          "c1_babulal_seed": {
+            "speaker": "Champa Tai",
+            "text": "That last month, before he passed — he kept saying he had 'one more delivery' to make. Wouldn't tell me to whom. Stubborn old goat. I think, beta, he meant you.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "One more delivery. He never made it. That's why the route came to you unfinished.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c2b", "text": "To me?", "stat_check": null, "next": "c1_end_warm", "effects": {"set_flag": "babulal_champa_seed", "add_note": "Champa: Baba spoke of 'one more delivery' in his last month. He never made it."}}
             ]
           },
           "c1_busy": {
@@ -1283,6 +1304,96 @@
           "sa_1": {
             "speaker": null,
             "text": "The stall is still there, glowing warmly. A handwritten note: 'Back in two weeks. Kettle is on the left.'",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      }
+    }
+  },
+
+  "babulal": {
+    "name": "Babulal",
+    "title": "The Route That Was Left to You",
+    "portrait_day": "",
+    "portrait_spirit": "",
+    "dialogue_trees": {
+
+      "finale": {
+        "start": "b1",
+        "nodes": {
+          "b1": {
+            "speaker": "NARRATOR",
+            "text": "Five spirits are at rest. The lantern-city is going dark, one flame at a time — all but the last, burning at the corner where your route begins each morning. Someone waits beneath it. You know the walk before you see the face.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "You have carried everyone's last words but one. You always knew whose they were.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c1a", "text": "...Baba?", "stat_check": null, "next": "b2", "effects": {}}
+            ]
+          },
+          "b2": {
+            "speaker": "Spirit — Babulal",
+            "text": "So. You can see them now. I spent your whole childhood hoping you never would. And a small, selfish part of me hoping you would.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He is not surprised to see you. He has been standing at this corner the whole time.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c2a", "text": "You left me the route.", "stat_check": null, "next": "b3", "effects": {}},
+              {"id": "c2b", "text": "[GRIEF 2] You had one delivery left. To me.", "stat_check": {"skill": "GRIEF", "threshold": 2}, "next": "b3_grief", "fail_next": "b3", "effects": {}}
+            ]
+          },
+          "b3": {
+            "speaker": "Spirit — Babulal",
+            "text": "Forty years I ran this route. I knew every order, every grief on every staircase. But there was one tin I never set down — the thing I meant to say to you.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c3a", "text": "Say it now. I'll carry it the last few steps for you.", "stat_check": null, "next": "b4", "effects": {}}
+            ]
+          },
+          "b3_grief": {
+            "speaker": "Spirit — Babulal",
+            "text": "You've grown a nose for the unsaid — I can tell. Yes. My own last delivery. I carried it so long it went cold in my hands, and still I couldn't hand it over.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "The deliveryman who could route anything, undone by the one address that was his own kitchen.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c3b", "text": "Then let me be your witness. Say it.", "stat_check": null, "next": "b4", "effects": {"set_flag": "babulal_saw_it_early"}}
+            ]
+          },
+          "b4": {
+            "speaker": "Spirit — Babulal",
+            "text": "I was proud. Too proud to be a burden while I was leaving. So I taught you the route instead of teaching you goodbye. Cowardice, dressed up as a gift.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "Every person on your route was some version of this man. You have been practising for this conversation all along.", "requires_stat": 2}
+            ],
+            "choices": [
+              {"id": "c4a", "text": "The route WAS a gift. I understand it now.", "stat_check": null, "next": "b5_warm", "effects": {"set_flag": "babulal_forgave", "stat_modify": {"GRIEF": 1}}},
+              {"id": "c4b", "text": "[EMPATHY 3] You didn't have to say goodbye. You just had to let me carry you the last few steps.", "stat_check": {"skill": "EMPATHY", "threshold": 3}, "next": "b5_empathy", "fail_next": "b5_warm", "effects": {"set_flags": ["babulal_forgave", "babulal_words_received"], "stat_modify": {"GRIEF": 1, "EMPATHY": 1}}}
+            ]
+          },
+          "b5_warm": {
+            "speaker": "Spirit — Babulal",
+            "text": "Then take the last words on my route, beta. I saw you. Every single day of you. Not once was I disappointed. Now put the tin down. Go home and eat something warm.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "c5a", "text": "(Take the words. Hold them level, the way he taught you.)", "stat_check": null, "next": "b6", "effects": {"set_flag": "babulal_finale_played"}}
+            ]
+          },
+          "b5_empathy": {
+            "speaker": "Spirit — Babulal",
+            "text": "...You always understood the work better than I did. The last words, then — and they are simple. I saw you. All of you. I was proud every single day. Now set the tin down, and let me set myself down too.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "This is what you have been learning to do on every staircase: let someone put a heavy thing down at last.", "requires_stat": 0}
+            ],
+            "choices": [
+              {"id": "c5b", "text": "(Take the words. Hold them level, the way he taught you.)", "stat_check": null, "next": "b6", "effects": {"set_flags": ["babulal_finale_played", "babulal_words_received"]}}
+            ]
+          },
+          "b6": {
+            "speaker": "NARRATOR",
+            "text": "The last lantern doesn't blow out — it is set down, gently, the way you lower a tiffin you've carried a long way. The street is only a street again. Somewhere ahead of you, morning is already starting to warm the stone.",
             "voice_interjections": [],
             "choices": [],
             "next": "END"

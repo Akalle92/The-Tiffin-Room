@@ -75,6 +75,23 @@ var routes: Dictionary = {}
 var flags: Dictionary = {}
 
 # ---------------------------------------------------------------------------
+# BABULAL / PROTAGONIST THREAD
+# You are Babulal's grandchild, carrying his route after his death. These flags
+# track the grandfather sub-story that is seeded by Mrs. Mehta and Champa and
+# pays off in the finale (see scripts/world/DayNightController.gd `_play_finale`).
+# ---------------------------------------------------------------------------
+const BABULAL_SEED_FLAGS := ["babulal_mehta_seed", "babulal_champa_seed"]
+
+## How many grandfather memories the player uncovered during the run (0–2).
+## Drives which finale lines Babulal speaks and the choice-reflective epilogue.
+func babulal_seeds_seen() -> int:
+	var seen := 0
+	for f in BABULAL_SEED_FLAGS:
+		if get_flag(f, false):
+			seen += 1
+	return seen
+
+# ---------------------------------------------------------------------------
 # PLAYER POSITION (persist across scene loads)
 # ---------------------------------------------------------------------------
 var player_world_position: Vector2 = Vector2(240, 135)

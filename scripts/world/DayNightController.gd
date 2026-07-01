@@ -29,6 +29,11 @@ const COLOR_NIGHT := Color(0.18, 0.15, 0.32, 1.0)
 var _current_world: Node2D = null
 var _transitioning: bool   = false
 
+## Finale orchestration: when the fifth spirit resolves we let the closing
+## dialogue finish, then play Babulal's payoff beat before the credits roll.
+var _pending_finale: bool = false
+var _finale_active: bool  = false
+
 # ---------------------------------------------------------------------------
 # _READY
 # ---------------------------------------------------------------------------
@@ -36,6 +41,7 @@ func _ready() -> void:
 	GameState.day_started.connect(_on_day_started)
 	GameState.night_started.connect(_on_night_started)
 	GameState.game_completed.connect(_on_game_completed)
+	DialogueManager.dialogue_ended.connect(_on_dialogue_ended)
 
 	# Load the correct world for current state
 	if GameState.is_night:
@@ -132,9 +138,36 @@ func _unhandled_input(event: InputEvent) -> void:
 			GameState.transition_to_night()
 
 # ---------------------------------------------------------------------------
-# ENDING
+# ENDING / FINALE
 # ---------------------------------------------------------------------------
+## Fired when the fifth spirit resolves. The resolving dialogue is still on
+## screen, so we defer: wait for it to close, then play Babulal's finale beat.
 func _on_game_completed() -> void:
-	# All spirit arcs resolved — roll credits after the current frame settles.
+	_pending_finale = true
+	if not DialogueManager.is_active:
+		_play_finale()
+
+## The player's own arc: having carried everyone else's last words, they finally
+## receive Babulal's. Runs as a normal dialogue tree ("babulal"/"finale") so it
+## reuses the whole dialogue UI; on close we roll the choice-reflective ending.
+func _play_finale() -> void:
+	if _finale_active:
+		return
+	_pending_finale = false
+	_finale_active = true
 	await _fade_out()
-	get_tree().change_scene_to_file(ENDING_SCENE)
+	if GameState.is_night and canvas_modulate:
+		canvas_modulate.color = COLOR_NIGHT
+	await _fade_in()
+	DialogueManager.start_dialogue("babulal", "finale")
+
+func _on_dialogue_ended(npc_id: String) -> void:
+	# Closing dialogue for the fifth spirit just ended — cue Babulal.
+	if _pending_finale and not _finale_active:
+		_play_finale()
+		return
+	# Babulal's finale just ended — roll credits.
+	if _finale_active and npc_id == "babulal":
+		_finale_active = false
+		await _fade_out()
+		get_tree().change_scene_to_file(ENDING_SCENE)

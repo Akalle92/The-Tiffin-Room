@@ -216,10 +216,15 @@ func _apply_choice_effects(choice: Dictionary) -> void:
 		for stat in stat_modify:
 			GameState.modify_stat(stat, stat_modify[stat])
 
-	# Flags
+	# Flags — single ("set_flag": "name") or multiple ("set_flags": ["a", "b"])
 	var set_flag: Variant = effects.get("set_flag", null)
 	if set_flag is String and set_flag != "":
 		GameState.set_flag(set_flag)
+	var set_flags: Variant = effects.get("set_flags", null)
+	if set_flags is Array:
+		for f in set_flags:
+			if f is String and f != "":
+				GameState.set_flag(f)
 
 	# Notes
 	var add_note: Variant = effects.get("add_note", null)
