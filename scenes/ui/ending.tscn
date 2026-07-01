@@ -29,10 +29,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -180.0
-offset_top = -96.0
-offset_right = 180.0
-offset_bottom = 96.0
+offset_left = -220.0
+offset_top = -130.0
+offset_right = 220.0
+offset_bottom = 130.0
 theme_override_constants/separation = 10
 
 [node name="Heading" type="Label" parent="Panel/VBox"]
@@ -43,21 +43,14 @@ text = "Every route, walked to its end."
 horizontal_alignment = 1
 
 [node name="Body" type="RichTextLabel" parent="Panel/VBox"]
-custom_minimum_size = Vector2(360, 110)
+custom_minimum_size = Vector2(430, 210)
 layout_mode = 2
 bbcode_enabled = true
 fit_content = true
-scroll_active = false
+scroll_active = true
 theme_override_colors/default_color = Color(0.9, 0.86, 0.8, 1)
 theme_override_font_sizes/normal_font_size = 11
-text = "[center]Five spirits lingered over unfinished things.
-You carried warm tiffins through day and dusk,
-listened, remembered, and set each one at rest.
-
-The stalls will open again tomorrow —
-but tonight, the streets are quiet, and grateful.
-
-[i]Thank you for walking the Tiffin Route.[/i][/center]"
+text = "[center]Every route, walked to its end.[/center]"
 
 [node name="ToTitleButton" type="Button" parent="Panel/VBox"]
 custom_minimum_size = Vector2(160, 26)

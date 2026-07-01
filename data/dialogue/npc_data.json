@@ -289,7 +289,9 @@
           "si_2": {
             "speaker": "Spirit — Mrs. Mehta",
             "text": "Oh. You're one of the ones who can see. Your grandfather could too, you know. He used to bring us what we needed without knowing it.",
-            "voice_interjections": [],
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "This is the shape of the sight: the dead who left one thing unsaid stay lantern-bright until someone carries it for them. The rest have already gone on.", "requires_stat": 0}
+            ],
             "choices": [
               {"id": "c2a", "text": "What are you holding?", "stat_check": null, "next": "si_3", "effects": {"route_update": {"spirit_state": 1}}},
               {"id": "c2b", "text": "Did Baba ever have something he couldn't deliver?", "stat_check": null, "next": "si_mehta_baba", "effects": {"route_update": {"spirit_state": 1}}}
