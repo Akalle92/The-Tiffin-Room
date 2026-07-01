@@ -179,12 +179,22 @@ func _pick_tree(npc_id: String) -> String:
 		return "spirit_intro"
 
 	var day_state: int = route.get("day_state", 0)
+	var delivery_count: int = route.get("delivery_count", 0)
 	if day_state == 0:
 		return "first_meeting"
-	elif trust >= 2:
+	# The heavy "trust" reveal (day_state 3) has already played — settle into
+	# low-stakes small talk rather than replaying the big confession.
+	if day_state >= 3:
+		return "small_talk"
+	# The trust reveal is earned: it needs both real rapport AND repeated
+	# visits, so the big confession never lands on the third line.
+	if trust >= 2 and delivery_count >= 3:
 		return "trust"
-	else:
-		return "developing"
+	# After the developing beat (day_state >= 2) but before the trust threshold,
+	# sit in small talk instead of replaying the developing scene.
+	if day_state >= 2:
+		return "small_talk"
+	return "developing"
 
 func _display_current_node() -> void:
 	if _current_node_id == "" or not _current_nodes.has(_current_node_id):
@@ -192,6 +202,10 @@ func _display_current_node() -> void:
 		return
 
 	var node: Dictionary = _current_nodes[_current_node_id]
+
+	# Apply any node-level effects (e.g. advancing day_state when a beat is
+	# reached). These are idempotent route updates, safe to run on display.
+	_apply_effects(node.get("effects", {}))
 
 	# Emit skill-voice interjections BEFORE the main line
 	for interjection in node.get("voice_interjections", []):

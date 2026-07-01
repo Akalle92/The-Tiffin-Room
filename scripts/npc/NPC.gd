@@ -73,12 +73,9 @@ func _deliver_tiffin() -> void:
 	_refresh_delivery_marker()
 	AudioManager.play_sfx_tiffin()
 
-	# Auto-advance day_state on first delivery
-	var route := GameState.get_route(npc_id)
-	if route.get("day_state", 0) == 0:
-		GameState.update_route(npc_id, {"day_state": 1})
-
-	# Open dialogue after delivery (contextual)
+	# Open dialogue after delivery (contextual). Note: we deliberately do NOT
+	# bump day_state here — the first_meeting tree sets it via its own node
+	# effects, so the introduction actually plays on the first delivery.
 	DialogueManager.start_dialogue(npc_id)
 
 func _on_delivery_completed(completed_id: String) -> void:

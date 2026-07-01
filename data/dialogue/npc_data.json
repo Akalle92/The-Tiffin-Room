@@ -146,6 +146,35 @@
         }
       },
 
+      "small_talk": {
+        "start": "st1",
+        "nodes": {
+          "st1": {
+            "speaker": "Mrs. Mehta",
+            "text": "The container's by the door, washed. ...Sit a moment, if your route allows. The mornings are long ones lately.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "s1", "text": "I can sit for a minute.", "stat_check": null, "next": "st2", "effects": {"route_update": {"trust_level": 2}, "add_note": "Sat with her a while. The ordinary mornings are the hardest to get through."}},
+              {"id": "s2", "text": "I wish I could — the route's waiting.", "stat_check": null, "next": "st_end", "effects": {}}
+            ]
+          },
+          "st2": {
+            "speaker": "Mrs. Mehta",
+            "text": "You have his patience, your baba. He never rushed a doorstep in his life.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "st_end": {
+            "speaker": "Mrs. Mehta",
+            "text": "Go on, then. Same time tomorrow.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
       "trust": {
         "start": "m3_letter",
         "nodes": {
@@ -500,6 +529,29 @@
         }
       },
 
+      "small_talk": {
+        "start": "st1",
+        "nodes": {
+          "st1": {
+            "speaker": "Raju",
+            "text": "You don't have to keep coming, you know. ...I mean. You can. If you want.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "That's as close to 'please stay' as his pride will let him get.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "s1", "text": "I want to. Save me a step to sit on.", "stat_check": null, "next": "st_end", "effects": {"route_update": {"trust_level": 2}, "add_note": "He's starting to expect me — and to want to be expected."}}
+            ]
+          },
+          "st_end": {
+            "speaker": "Raju",
+            "text": "...Okay. This step's mine, that one's yours. Not the shady one, that's mine also.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
       "trust": {
         "start": "r3_phone",
         "nodes": {
@@ -827,6 +879,27 @@
         }
       },
 
+      "small_talk": {
+        "start": "st1",
+        "nodes": {
+          "st1": {
+            "speaker": "Desai Sahib",
+            "text": "You're early. Again. ...The canteen tea is undrinkable, in case you were wondering why I look like this.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "s1", "text": "I'll bring you a real cup tomorrow. Champa's, not the canteen's.", "stat_check": null, "next": "st_end", "effects": {"route_update": {"trust_level": 2}, "add_note": "Small talk over bad canteen tea. He almost smiled."}}
+            ]
+          },
+          "st_end": {
+            "speaker": "Desai Sahib",
+            "text": "...That would be. Yes. Thank you. Window 4 side, remember.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
       "trust": {
         "start": "d3_confession",
         "nodes": {
@@ -1090,6 +1163,29 @@
           "a2_grief_response": {
             "speaker": "Arjun",
             "text": "No. In Hindi either. I've looked.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          }
+        }
+      },
+
+      "small_talk": {
+        "start": "st1",
+        "nodes": {
+          "st1": {
+            "speaker": "Arjun",
+            "text": "He left the container outside again, rinsed. He's never said a word about the food. But it's always rinsed.",
+            "voice_interjections": [
+              {"skill": "NOSE", "text": "Rinsed, not scrubbed. A small courtesy from a man who won't say thank you out loud yet.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "s1", "text": "That's a whole conversation, in this house.", "stat_check": null, "next": "st_end", "effects": {"route_update": {"trust_level": 2}, "add_note": "Father rinses the tiffin but says nothing. It counts as talking, here."}}
+            ]
+          },
+          "st_end": {
+            "speaker": "Arjun",
+            "text": "It is, isn't it. ...I'm learning to read him again. Slowly.",
             "voice_interjections": [],
             "choices": [],
             "next": "END"
@@ -1440,6 +1536,27 @@
             "choices": [
               {"id": "e2", "text": "(Take the chai.)", "stat_check": null, "next": "END", "effects": {"set_flag": "champa_convergence_seen", "add_note": "The lane is knitting itself back together. Champa sees it. So do you."}}
             ]
+          }
+        }
+      },
+
+      "small_talk": {
+        "start": "st1",
+        "nodes": {
+          "st1": {
+            "speaker": "Champa Tai",
+            "text": "Busy route today? Here — second cup's already poured. Don't argue with a woman holding hot chai.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "s1", "text": "(Take the cup. Sit.)", "stat_check": null, "next": "st_end", "effects": {"route_update": {"trust_level": 2}, "add_note": "A regular at the stall now. She pours before I ask."}}
+            ]
+          },
+          "st_end": {
+            "speaker": "Champa Tai",
+            "text": "See, this is what your baba understood. A route isn't just tins. It's the sitting-down in between. Now shoo.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
           }
         }
       },
