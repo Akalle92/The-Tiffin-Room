@@ -547,10 +547,13 @@
         "nodes": {
           "sr_1": {
             "speaker": "Spirit — Raju",
-            "text": "I'm ready to call. I just need — I need to hear myself do it. Can you be here?",
-            "voice_interjections": [],
+            "text": "I think I'm ready. I just need — I need to hear myself do it. Can you be here? ...Or is it stupid, still being scared of a phone?",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "Two roads open here. He can make the call now — or he can choose to simply stop hiding, and let the call come when it is his own.", "requires_stat": 1}
+            ],
             "choices": [
-              {"id": "c1a", "text": "I'm here. Say 'hello.'", "stat_check": null, "next": "sr_2", "effects": {}}
+              {"id": "c1a", "text": "It's not stupid. I'm here. Say 'hello' — call them now.", "stat_check": null, "next": "sr_2", "effects": {}},
+              {"id": "c1b", "text": "You don't have to call today. Just stop hiding — the rest can come when it's yours to choose.", "stat_check": null, "next": "sr_wait", "effects": {}}
             ]
           },
           "sr_2": {
@@ -560,12 +563,29 @@
               {"skill": "EMPATHY", "text": "There it is. The whole weight of nine days in four words.", "requires_stat": 0}
             ],
             "choices": [
-              {"id": "c2a", "text": "(Say nothing. Let him have this.)", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flag": "raju_resolved", "add_note": "He made the call. He's going home.", "stat_modify": {"EMPATHY": 1}}}
+              {"id": "c2a", "text": "(Say nothing. Let him have this.)", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flags": ["raju_resolved", "raju_went_home"], "add_note": "He made the call. He's going home.", "stat_modify": {"EMPATHY": 1}}}
             ]
           },
           "sr_end": {
             "speaker": "Spirit — Raju",
             "text": "The phone vanished. I think — I think it worked. Go. I'm going to go find a real phone now.",
+            "voice_interjections": [],
+            "choices": [],
+            "next": "END"
+          },
+          "sr_wait": {
+            "speaker": "Spirit — Raju",
+            "text": "...Not the call. Not yet. But tomorrow I'll sit on the steps in the daylight and let the chai man see my face. I'll stop being a rumour. That's a start, isn't it?",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Not every door opens the day you find the handle. Some people have to be seen before they can be heard.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c3a", "text": "That's more than a start. Go and be seen.", "stat_check": null, "next": "sr_wait_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flags": ["raju_resolved", "raju_stayed_seen"], "add_note": "Not ready to call home yet — but he chose to stop hiding. He'll be seen on the steps by day."}}
+            ]
+          },
+          "sr_wait_end": {
+            "speaker": "Spirit — Raju",
+            "text": "The phone stays in my pocket this time. That's okay — it'll still be there tomorrow. Go on. I'll be around.",
             "voice_interjections": [],
             "choices": [],
             "next": "END"
@@ -578,7 +598,7 @@
         "nodes": {
           "sa_1": {
             "speaker": null,
-            "text": "The steps are empty. He's gone home.",
+            "text": "The steps are quiet in the lantern-light. Whatever Raju chose, he chose it with his own hands — and he isn't a rumour anymore.",
             "voice_interjections": [],
             "choices": [],
             "next": "END"
@@ -750,7 +770,18 @@
             "voice_interjections": [],
             "choices": [
               {"id": "c2a", "text": "Is there another way to fund the treatments?", "stat_check": null, "next": "d3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "add_note": "He confessed the source of the bribes. Wife's medical costs. Wants a way out."}},
-              {"id": "c2b", "text": "[EMPATHY 3] You've been alone with this for two years.", "stat_check": {"skill": "EMPATHY", "threshold": 3}, "next": "d3_end_empathy", "fail_next": "d3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "stat_modify": {"EMPATHY": 1}}}
+              {"id": "c2b", "text": "[EMPATHY 3] You've been alone with this for two years.", "stat_check": {"skill": "EMPATHY", "threshold": 3}, "next": "d3_end_empathy", "fail_next": "d3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "stat_modify": {"EMPATHY": 1}}},
+              {"id": "c2c", "text": "What you take — it comes from people with even less than you.", "stat_check": null, "next": "d3_moral", "effects": {"set_flag": "desai_confronted"}}
+            ]
+          },
+          "d3_moral": {
+            "speaker": "Desai Sahib",
+            "text": "...You think I don't know that? Every note I take has a face attached to it. I tell myself hers weighs more. Some nights I even believe it.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "He is not a cartoon villain. He is a man who priced his wife's life against strangers' and cannot unfeel the arithmetic.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "c3a", "text": "Then let's find you a way that doesn't need a scale at all.", "stat_check": null, "next": "d3_end", "effects": {"route_update": {"day_state": 3, "trust_level": 3}, "add_note": "Confronted him about who pays for the bribes. He already knew every face. He wants out."}}
             ]
           },
           "d3_end": {
@@ -832,13 +863,15 @@
               {"skill": "GRIEF", "text": "Pride as its own kind of poverty. He couldn't bear the paperwork of needing help.", "requires_stat": 1}
             ],
             "choices": [
-              {"id": "c2a", "text": "Applying means you love her more than you need to seem fine.", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flag": "desai_resolved", "add_note": "Spirit delivered: the form he never filled. PM-JAY. He needed permission to need help.", "stat_modify": {"GRIEF": 1}}}
+              {"id": "c2a", "text": "Applying means you love her more than you need to seem fine.", "stat_check": null, "next": "sr_end", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flags": ["desai_resolved", "desai_bittersweet"], "add_note": "Spirit delivered: the form he never filled. PM-JAY. He needed permission to need help. Whether it's in time for her, no one can promise.", "stat_modify": {"GRIEF": 1}}}
             ]
           },
           "sr_end": {
             "speaker": "Spirit — Desai Sahib",
-            "text": "The papers have stopped. ...I'll fill it in the morning. The real one.",
-            "voice_interjections": [],
+            "text": "The papers have stopped. I'll file the real one in the morning. It may already be late for her — the doctors don't make promises. But no one else's family will pay for my fear now. That much I can still deliver.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Some deliveries don't undo the loss. They only make sure the loss stops spreading.", "requires_stat": 0}
+            ],
             "choices": [],
             "next": "END"
           }
