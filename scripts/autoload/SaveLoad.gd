@@ -31,8 +31,10 @@ func save() -> void:
 		config.set_value("route_" + npc_id, "notes",           r.get("notes", []))
 		config.set_value("route_" + npc_id, "unlocked",        r.get("unlocked", false))
 		config.set_value("route_" + npc_id, "spirit_unlocked", r.get("spirit_unlocked", false))
+		config.set_value("route_" + npc_id, "spirit_unlocked_day", r.get("spirit_unlocked_day", 0))
 		config.set_value("route_" + npc_id, "spirit_state",    r.get("spirit_state", 0))
 		config.set_value("route_" + npc_id, "spirit_resolved", r.get("spirit_resolved", false))
+		config.set_value("route_" + npc_id, "hardened",        r.get("hardened", false))
 
 	# --- flags ---
 	for flag in gs.flags:
@@ -78,8 +80,10 @@ func load_game() -> void:
 			gs.routes[npc_id]["notes"]            = config.get_value(section, "notes",           [])
 			gs.routes[npc_id]["unlocked"]         = config.get_value(section, "unlocked",        false)
 			gs.routes[npc_id]["spirit_unlocked"]  = config.get_value(section, "spirit_unlocked", false)
+			gs.routes[npc_id]["spirit_unlocked_day"] = config.get_value(section, "spirit_unlocked_day", 0)
 			gs.routes[npc_id]["spirit_state"]     = config.get_value(section, "spirit_state",    0)
 			gs.routes[npc_id]["spirit_resolved"]  = config.get_value(section, "spirit_resolved", false)
+			gs.routes[npc_id]["hardened"]         = config.get_value(section, "hardened",        false)
 
 	# --- flags ---
 	if config.has_section("flags"):

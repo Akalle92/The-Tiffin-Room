@@ -160,9 +160,13 @@ func _show_detail(npc_id: String) -> void:
 	# Spirit status
 	var spirit_resolved: bool  = route.get("spirit_resolved", false)
 	var spirit_unlocked: bool  = route.get("spirit_unlocked", false)
+	var hardened: bool = route.get("hardened", false)
 	if spirit_resolved:
 		detail_spirit_status.text = "Spirit: ✦ Resolved"
 		detail_spirit_status.add_theme_color_override("font_color", Color(0.9, 0.85, 0.5))
+	elif spirit_unlocked and hardened:
+		detail_spirit_status.text = "Spirit: ◍ Distant — neglected too long"
+		detail_spirit_status.add_theme_color_override("font_color", Color(0.7, 0.45, 0.45))
 	elif spirit_unlocked:
 		detail_spirit_status.text = "Spirit: ◎ Accessible (visit at night)"
 		detail_spirit_status.add_theme_color_override("font_color", Color(0.65, 0.55, 0.9))

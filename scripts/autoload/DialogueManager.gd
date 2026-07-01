@@ -165,6 +165,8 @@ func _pick_tree(npc_id: String) -> String:
 		var spirit_resolved: bool = route.get("spirit_resolved", false)
 		if spirit_resolved:
 			return "spirit_aftermath"
+		if route.get("hardened", false):
+			return "spirit_hardened"
 		var spirit_state: int = route.get("spirit_state", 0)
 		if spirit_state >= 1:
 			return "spirit_resolution"

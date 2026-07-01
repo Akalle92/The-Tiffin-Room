@@ -169,8 +169,10 @@ func _init_default_routes() -> void:
 				"delivery_count":   0,
 				"notes":            [],
 				"spirit_unlocked":  false,
+				"spirit_unlocked_day": 0,
 				"spirit_state":     0,
 				"spirit_resolved":  false,
+				"hardened":         false,
 			}
 
 # ---------------------------------------------------------------------------
@@ -188,6 +190,9 @@ func update_route(npc_id: String, updates: Dictionary) -> void:
 		return
 	for key in updates:
 		routes[npc_id][key] = updates[key]
+	# Stamp the day a spirit first becomes reachable, for neglect tracking.
+	if routes[npc_id].get("spirit_unlocked", false) and int(routes[npc_id].get("spirit_unlocked_day", 0)) == 0:
+		routes[npc_id]["spirit_unlocked_day"] = day_number
 	route_updated.emit(npc_id)
 	SaveLoad.save()
 	# Fire the ending exactly once when every arc is resolved.
@@ -257,14 +262,33 @@ func transition_to_night() -> void:
 	night_started.emit(day_number)
 	SaveLoad.save()
 
+## A spirit left unvisited-unresolved for this many days grows "hardened":
+## still resolvable, but only through a colder, bittersweet homecoming.
+const DECAY_DAYS := 4
+
 func transition_to_day() -> void:
 	is_night = false
 	day_number += 1
 	time_of_day = 0.1
 	completed_deliveries.clear()
 	today_deliveries = _generate_day_deliveries()
+	_check_spirit_decay()
 	day_started.emit(day_number)
 	SaveLoad.save()
+
+## Neglect has a cost: unresolved spirits that wait too long harden.
+func _check_spirit_decay() -> void:
+	for npc_id in routes:
+		var r: Dictionary = routes[npc_id]
+		if not r.get("spirit_unlocked", false):
+			continue
+		if r.get("spirit_resolved", false) or r.get("hardened", false):
+			continue
+		var unlocked_day: int = int(r.get("spirit_unlocked_day", 0))
+		if unlocked_day > 0 and (day_number - unlocked_day) >= DECAY_DAYS:
+			r["hardened"] = true
+			add_note(npc_id, "You let too many nights pass. The spirit has grown distant — this will be a harder, colder homecoming.")
+			route_updated.emit(npc_id)
 
 func _generate_day_deliveries() -> Array[String]:
 	var deliveries: Array[String] = []

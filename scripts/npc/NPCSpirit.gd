@@ -76,6 +76,11 @@ func interact() -> void:
 		DialogueManager.start_dialogue(npc_id, "spirit_not_ready")
 		return
 
+	# Neglected too long: a colder, bittersweet homecoming.
+	if route.get("hardened", false):
+		DialogueManager.start_dialogue(npc_id, "spirit_hardened")
+		return
+
 	var spirit_state: int = route.get("spirit_state", 0)
 	if spirit_state == 0:
 		DialogueManager.start_dialogue(npc_id, "spirit_intro")

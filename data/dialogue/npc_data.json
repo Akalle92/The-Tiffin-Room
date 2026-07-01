@@ -203,6 +203,47 @@
         }
       },
 
+      "spirit_hardened": {
+        "start": "h1",
+        "nodes": {
+          "h1": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "You came, in the end. I stopped counting the nights. The letter feels heavier now — or maybe I've just worn out from holding it.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Grief left waiting too long doesn't disappear. It hardens into something quieter and colder.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "h1a", "text": "I'm sorry I'm late. Let me help you set it down now.", "stat_check": null, "next": "h2", "effects": {}}
+            ]
+          },
+          "h2": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "Read it, then. I don't have the wonder left for it. But perhaps you do — enough for both of us.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "h2a", "text": "[EMPATHY 3] It's still from him. That never spoils, however late it comes.", "stat_check": {"skill": "EMPATHY", "threshold": 3}, "next": "h_warm", "fail_next": "h_cold", "effects": {}},
+              {"id": "h2b", "text": "(Read it to her, plainly.)", "stat_check": null, "next": "h_cold", "effects": {}}
+            ]
+          },
+          "h_warm": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "...Oh. You're right. It doesn't spoil. He loved the thirty-two years. Late or not — I heard him. Thank you, beta. Go now.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "hwa", "text": "(Stay until the lantern settles.)", "stat_check": null, "next": "END", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flags": ["mrs_mehta_resolved"], "add_note": "Delivered late — but with enough tenderness that the warmth came back.", "stat_modify": {"GRIEF": 1}}}
+            ]
+          },
+          "h_cold": {
+            "speaker": "Spirit — Mrs. Mehta",
+            "text": "There. Now it's said, and I'm glad it's said. I only wish I'd kept the strength to still be surprised by it. Go on. I'm tired.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "hca", "text": "(Fold the letter, and leave her the quiet.)", "stat_check": null, "next": "END", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flags": ["mrs_mehta_resolved", "mrs_mehta_hardened"], "add_note": "The letter arrived late. She heard it, but the wonder had worn thin."}}
+            ]
+          }
+        }
+      },
+
       "spirit_intro": {
         "start": "si_1",
         "nodes": {
@@ -511,6 +552,30 @@
         }
       },
 
+      "spirit_hardened": {
+        "start": "h1",
+        "nodes": {
+          "h1": {
+            "speaker": "Spirit — Raju",
+            "text": "Oh. It's you. I thought you'd forgotten. I almost had too — what my own voice sounds like, saying 'Ammi.'",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "A child left waiting learns the wrong lesson: that waiting is what he is for.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "h1a", "text": "You didn't forget. Neither did they. Try it — just once.", "stat_check": null, "next": "h2", "effects": {}}
+            ]
+          },
+          "h2": {
+            "speaker": "Spirit — Raju",
+            "text": "...Hello. Ammi. It's me. I'm sorry it took so long. ...The phone's gone quiet now. Maybe that's all right. Maybe late is still a kind of coming home.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "h2a", "text": "(Nod. It counts. It all counts.)", "stat_check": null, "next": "END", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flags": ["raju_resolved", "raju_hardened"], "add_note": "Called home late, after a long silence. It landed softer than it should have — but it landed."}}
+            ]
+          }
+        }
+      },
+
       "spirit_intro": {
         "start": "si_1",
         "nodes": {
@@ -814,6 +879,30 @@
         }
       },
 
+      "spirit_hardened": {
+        "start": "h1",
+        "nodes": {
+          "h1": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "You took your time. The papers stopped moving on their own a while ago. Turns out despair is very tidy.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "Left alone too long, his shame simply lay down and stopped fighting. That is its own kind of loss.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "h1a", "text": "It's PM-JAY — the form you should have filed. It's not too late to be honest.", "stat_check": null, "next": "h2", "effects": {}}
+            ]
+          },
+          "h2": {
+            "speaker": "Spirit — Desai Sahib",
+            "text": "...For her, perhaps it is too late. For me — I'll still file it. So the next frightened man in my chair isn't taught to do what I did.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "h2a", "text": "(That's still a delivery worth making.)", "stat_check": null, "next": "END", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flags": ["desai_resolved", "desai_hardened", "desai_bittersweet"], "add_note": "Reached him late. The form comes too slow for her, but he'll stop the harm from spreading."}}
+            ]
+          }
+        }
+      },
+
       "spirit_intro": {
         "start": "si_1",
         "nodes": {
@@ -1051,6 +1140,30 @@
             "voice_interjections": [],
             "choices": [],
             "next": "END"
+          }
+        }
+      },
+
+      "spirit_hardened": {
+        "start": "h1",
+        "nodes": {
+          "h1": {
+            "speaker": "Spirit — Arjun",
+            "text": "You're late. I stopped knocking. It's quieter, not knocking. I'd almost made peace with the door staying shut.",
+            "voice_interjections": [
+              {"skill": "EMPATHY", "text": "He built a smaller life against the closed door. Now you're asking him to want the whole house again.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "h1a", "text": "Knock once more. I'll carry the words. Someone's still on the other side.", "stat_check": null, "next": "h2", "effects": {}}
+            ]
+          },
+          "h2": {
+            "speaker": "Spirit — Arjun",
+            "text": "...Tell him I was a coward, and I'm done being one. ...The door's opening. Slower than it might have. But it's opening.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "h2a", "text": "(Hold it open until he steps through.)", "stat_check": null, "next": "END", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flags": ["arjun_resolved", "arjun_hardened"], "add_note": "The door opened, stiff from being shut so long. Both men were still behind it."}}
+            ]
           }
         }
       },
@@ -1319,6 +1432,30 @@
             "voice_interjections": [],
             "choices": [],
             "next": "END"
+          }
+        }
+      },
+
+      "spirit_hardened": {
+        "start": "h1",
+        "nodes": {
+          "h1": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "Ah, you. I'd nearly decided the ticket was just a thing to carry, not a thing to use. It's softer, giving up. Warmer, almost.",
+            "voice_interjections": [
+              {"skill": "GRIEF", "text": "The longer 'someday' waits, the better it learns to pass for 'never' — and call itself contentment.", "requires_stat": 1}
+            ],
+            "choices": [
+              {"id": "h1a", "text": "You're allowed both places. Even now. Especially now.", "stat_check": null, "next": "h2", "effects": {}}
+            ]
+          },
+          "h2": {
+            "speaker": "Spirit — Champa Tai",
+            "text": "...Both places. Hah. Stubborn boy. Fine — I'll book the time off before I talk myself out of it again. The mango tree is gone, but the road to it isn't.",
+            "voice_interjections": [],
+            "choices": [
+              {"id": "h2a", "text": "(Go home, Champa Tai. We'll hold the stall.)", "stat_check": null, "next": "END", "effects": {"route_update": {"spirit_resolved": true, "spirit_state": 2}, "set_flags": ["champa_resolved", "champa_hardened"], "add_note": "Almost let 'someday' become 'never.' Booked the trip late — but booked it."}}
+            ]
           }
         }
       },
