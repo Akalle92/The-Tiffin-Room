@@ -47,11 +47,21 @@ Spirit / night variants: same character, cooler indigo palette, soft translucent
 slightly ethereal — same silhouette so they read as the same person.
 
 ## Environment set
+All world tiles ship at **64x64** so tiling density matches the ~40px characters
+(windows/doors must never dwarf a person).
 - `cobblestone_day` / `cobblestone_night` — seamless street ground tile.
+- `roof_terracotta` — seamless top-down barrel-tile roof (procedural, `tools/make_roof.py`).
 - `tenement_facade` — seamless tenement wall (day, NW block).
 - `bazaar_shopfront` — seamless shopfront wall with awnings (day, S blocks).
 - `temple_wall` — seamless carved temple wall with marigold garlands (day, NE block).
 - `tenement_night` — seamless night tenement with warm lit windows (all night blocks).
+
+## Block anatomy (why the city stopped looking like wallpaper)
+Every city block is layered top-down: **roof strip → eave shadow line → facade
+(street-level face) → drop shadow on the street → walkable ground**. Facades are
+only ever the *face* of a building, never a fill texture for a whole region.
+NPCs, props, and the player live exclusively on the street cross
+(horizontal lane y 105-165, vertical lane x 195-245).
 - `temple_stone` — seamless temple stone.
 - `interior_floor` — seamless apartment kitchen floor.
 - Props: `chai_stall`, `municipal_office`, `market_cart`, `street_lamp`.

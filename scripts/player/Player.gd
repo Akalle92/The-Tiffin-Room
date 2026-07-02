@@ -7,6 +7,7 @@ extends CharacterBody2D
 # ---------------------------------------------------------------------------
 const SPEED := 80.0
 const INTERACTION_RADIUS := 20.0
+const SPAWN_POSITION := Vector2(240, 135)
 
 ## 1024×1024 sprite sheet — 2×2 grid: top-left=down, top-right=up, bottom-left=left, bottom-right=right.
 @export var world_sprite_sheet: Texture2D
@@ -28,8 +29,11 @@ var _carrying_tiffin: bool = true   # Carrying today's stack
 # _READY
 # ---------------------------------------------------------------------------
 func _ready() -> void:
-	# Sync position from GameState (respawns where we left off)
-	global_position = GameState.player_world_position
+	# Sync position from GameState (respawns where we left off).
+	# Saves from before the street-layout rework may sit inside a building,
+	# so anything outside the walkable street cross respawns at the crossroads.
+	global_position = _safe_position(GameState.player_world_position)
+	GameState.player_world_position = global_position
 
 	# Connect dialogue lock/unlock
 	DialogueManager.dialogue_started.connect(_on_dialogue_started)
@@ -42,6 +46,14 @@ func _ready() -> void:
 	# Placeholder: draw a colored rect if no sprite sheet yet
 	if sprite == null:
 		push_warning("Player: AnimatedSprite2D not found — using placeholder draw.")
+
+func _safe_position(p: Vector2) -> Vector2:
+	var in_horizontal_lane := p.y >= 108.0 and p.y <= 163.0
+	var in_vertical_lane   := p.x >= 200.0 and p.x <= 240.0
+	var in_bounds          := p.x >= 15.0 and p.x <= 465.0 and p.y >= 15.0 and p.y <= 255.0
+	if in_bounds and (in_horizontal_lane or in_vertical_lane):
+		return p
+	return SPAWN_POSITION
 
 # ---------------------------------------------------------------------------
 # PHYSICS PROCESS

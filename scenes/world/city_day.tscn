@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/tenement_facade.png" id="4_tenement"]
 [ext_resource type="Texture2D" path="res://assets/tiles/temple_wall.png" id="14_temple"]
 [ext_resource type="Texture2D" path="res://assets/tiles/bazaar_shopfront.png" id="15_shopfront"]
+[ext_resource type="Texture2D" path="res://assets/tiles/roof_terracotta.png" id="16_roof"]
 [ext_resource type="Texture2D" path="res://assets/sprites/props/chai_stall.png" id="5_chai"]
 [ext_resource type="Texture2D" path="res://assets/sprites/props/municipal_office.png" id="6_office"]
 [ext_resource type="Texture2D" path="res://assets/sprites/props/market_props.png" id="7_market"]
@@ -52,11 +53,21 @@ offset_bottom = 270.0
 texture = ExtResource("3_cobble_day")
 stretch_mode = 1
 texture_repeat = 2
+modulate = Color(0.72, 0.68, 0.66, 1)
 z_index = -10
 
 [node name="Buildings" type="Node2D" parent="."]
 
-[node name="Block_NW" type="TextureRect" parent="Buildings"]
+[node name="Roof_NW" type="TextureRect" parent="Buildings"]
+offset_right = 195.0
+offset_bottom = 41.0
+texture = ExtResource("16_roof")
+stretch_mode = 1
+texture_repeat = 2
+z_index = -1
+
+[node name="Facade_NW" type="TextureRect" parent="Buildings"]
+offset_top = 41.0
 offset_right = 195.0
 offset_bottom = 105.0
 texture = ExtResource("4_tenement")
@@ -64,8 +75,18 @@ stretch_mode = 1
 texture_repeat = 2
 z_index = -1
 
-[node name="Block_NE" type="TextureRect" parent="Buildings"]
+[node name="Roof_NE" type="TextureRect" parent="Buildings"]
 offset_left = 245.0
+offset_right = 480.0
+offset_bottom = 41.0
+texture = ExtResource("16_roof")
+stretch_mode = 1
+texture_repeat = 2
+z_index = -1
+
+[node name="Facade_NE" type="TextureRect" parent="Buildings"]
+offset_left = 245.0
+offset_top = 41.0
 offset_right = 480.0
 offset_bottom = 105.0
 texture = ExtResource("14_temple")
@@ -73,8 +94,17 @@ stretch_mode = 1
 texture_repeat = 2
 z_index = -1
 
-[node name="Block_SW" type="TextureRect" parent="Buildings"]
+[node name="Roof_SW" type="TextureRect" parent="Buildings"]
 offset_top = 165.0
+offset_right = 195.0
+offset_bottom = 206.0
+texture = ExtResource("16_roof")
+stretch_mode = 1
+texture_repeat = 2
+z_index = -1
+
+[node name="Facade_SW" type="TextureRect" parent="Buildings"]
+offset_top = 206.0
 offset_right = 195.0
 offset_bottom = 270.0
 texture = ExtResource("15_shopfront")
@@ -82,9 +112,19 @@ stretch_mode = 1
 texture_repeat = 2
 z_index = -1
 
-[node name="Block_SE" type="TextureRect" parent="Buildings"]
+[node name="Roof_SE" type="TextureRect" parent="Buildings"]
 offset_left = 245.0
 offset_top = 165.0
+offset_right = 480.0
+offset_bottom = 206.0
+texture = ExtResource("16_roof")
+stretch_mode = 1
+texture_repeat = 2
+z_index = -1
+
+[node name="Facade_SE" type="TextureRect" parent="Buildings"]
+offset_left = 245.0
+offset_top = 206.0
 offset_right = 480.0
 offset_bottom = 270.0
 texture = ExtResource("15_shopfront")
@@ -92,22 +132,82 @@ stretch_mode = 1
 texture_repeat = 2
 z_index = -1
 
+[node name="Eave_NW" type="ColorRect" parent="Buildings"]
+offset_top = 41.0
+offset_right = 195.0
+offset_bottom = 44.0
+color = Color(0, 0, 0, 0.3)
+z_index = -1
+
+[node name="Eave_NE" type="ColorRect" parent="Buildings"]
+offset_left = 245.0
+offset_top = 41.0
+offset_right = 480.0
+offset_bottom = 44.0
+color = Color(0, 0, 0, 0.3)
+z_index = -1
+
+[node name="Eave_SW" type="ColorRect" parent="Buildings"]
+offset_top = 206.0
+offset_right = 195.0
+offset_bottom = 209.0
+color = Color(0, 0, 0, 0.3)
+z_index = -1
+
+[node name="Eave_SE" type="ColorRect" parent="Buildings"]
+offset_left = 245.0
+offset_top = 206.0
+offset_right = 480.0
+offset_bottom = 209.0
+color = Color(0, 0, 0, 0.3)
+z_index = -1
+
+[node name="StreetShadow_NW" type="ColorRect" parent="Buildings"]
+offset_top = 105.0
+offset_right = 195.0
+offset_bottom = 111.0
+color = Color(0, 0, 0, 0.22)
+z_index = -1
+
+[node name="StreetShadow_NE" type="ColorRect" parent="Buildings"]
+offset_left = 245.0
+offset_top = 105.0
+offset_right = 480.0
+offset_bottom = 111.0
+color = Color(0, 0, 0, 0.22)
+z_index = -1
+
+[node name="RoofEdge_SW" type="ColorRect" parent="Buildings"]
+offset_top = 165.0
+offset_right = 195.0
+offset_bottom = 167.0
+color = Color(0.35, 0.16, 0.1, 0.9)
+z_index = -1
+
+[node name="RoofEdge_SE" type="ColorRect" parent="Buildings"]
+offset_left = 245.0
+offset_top = 165.0
+offset_right = 480.0
+offset_bottom = 167.0
+color = Color(0.35, 0.16, 0.1, 0.9)
+z_index = -1
+
 [node name="Props" type="Node2D" parent="."]
 y_sort_enabled = true
 
 [node name="TeaStall" type="Sprite2D" parent="Props"]
-position = Vector2(345, 190)
-scale = Vector2(0.063, 0.063)
+position = Vector2(350, 136)
+scale = Vector2(0.055, 0.055)
 texture = ExtResource("5_chai")
 
 [node name="MunicipalOffice" type="Sprite2D" parent="Props"]
-position = Vector2(415, 55)
-scale = Vector2(0.078, 0.078)
+position = Vector2(445, 132)
+scale = Vector2(0.06, 0.06)
 texture = ExtResource("6_office")
 
 [node name="MarketCart" type="Sprite2D" parent="Props"]
-position = Vector2(150, 225)
-scale = Vector2(0.063, 0.063)
+position = Vector2(150, 138)
+scale = Vector2(0.055, 0.055)
 texture = ExtResource("7_market")
 
 [node name="WorldBounds" type="StaticBody2D" parent="."]
@@ -154,31 +254,31 @@ shape = SubResource("BC_SE")
 y_sort_enabled = true
 
 [node name="MrsMehta" parent="NPCContainer" instance=ExtResource("2_npc")]
-position = Vector2(180, 95)
+position = Vector2(170, 124)
 npc_id = "mrs_mehta"
 display_name = "Mrs. Mehta"
 world_sprite_sheet = ExtResource("9_mrs_mehta_world")
 
 [node name="Raju" parent="NPCContainer" instance=ExtResource("2_npc")]
-position = Vector2(280, 155)
+position = Vector2(280, 152)
 npc_id = "raju"
 display_name = "Raju"
 world_sprite_sheet = ExtResource("10_raju_world")
 
 [node name="Champa" parent="NPCContainer" instance=ExtResource("2_npc")]
-position = Vector2(340, 195)
+position = Vector2(324, 154)
 npc_id = "champa"
 display_name = "Champa Tai"
 world_sprite_sheet = ExtResource("11_champa_world")
 
 [node name="Desai" parent="NPCContainer" instance=ExtResource("2_npc")]
-position = Vector2(380, 120)
+position = Vector2(422, 156)
 npc_id = "desai"
 display_name = "Desai Sahib"
 world_sprite_sheet = ExtResource("12_desai_world")
 
 [node name="Arjun" parent="NPCContainer" instance=ExtResource("2_npc")]
-position = Vector2(100, 185)
+position = Vector2(100, 152)
 npc_id = "arjun"
 display_name = "Arjun"
 world_sprite_sheet = ExtResource("13_arjun_world")

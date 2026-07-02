@@ -20,3 +20,9 @@ Desktop.ini
 .DS_Store
 *.tmp
 *~
+
+# Capture/review scratch output
+tools/cap_*.png
+tools/cap_*.png.import
+tools/zoom_*.png*
+tools/roof_preview.png*
