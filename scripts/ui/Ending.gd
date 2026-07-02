@@ -6,7 +6,7 @@ extends Control
 const TITLE_SCENE := "res://scenes/ui/title.tscn"
 
 @onready var to_title_btn: Button = $Panel/VBox/ToTitleButton
-@onready var body: RichTextLabel  = $Panel/VBox/Body
+@onready var body: RichTextLabel  = $Panel/VBox/Scroll/Body
 
 func _ready() -> void:
 	to_title_btn.pressed.connect(_on_to_title)

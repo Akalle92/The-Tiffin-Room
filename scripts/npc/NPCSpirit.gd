@@ -42,11 +42,10 @@ func _ready() -> void:
 	# Spirits are invisible until their day-world route is unlocked enough
 	visible = _should_be_visible()
 
-	# Gentle point light (placeholder — will be replaced by real Light2D in scene)
+	# Tint the glow with this spirit's colour; keep the scene's radial texture,
+	# energy and scale (the _process pulse animates energy around this base).
 	if glow_light:
-		glow_light.color = spirit_color
-		glow_light.energy = 1.2
-		glow_light.texture_scale = 2.0
+		glow_light.color = spirit_color.lightened(0.35)
 
 	GameState.route_updated.connect(_on_route_updated)
 
@@ -58,6 +57,7 @@ func _process(delta: float) -> void:
 		return
 	_pulse_timer += delta * 1.5
 	glow_light.energy = 1.0 + 0.4 * sin(_pulse_timer)
+	queue_redraw()  # _draw() alpha-pulses the sprite with _pulse_timer
 
 # ---------------------------------------------------------------------------
 # INTERACT

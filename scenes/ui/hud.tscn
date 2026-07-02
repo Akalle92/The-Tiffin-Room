@@ -7,13 +7,24 @@
 layer = 10
 script = ExtResource("1_hud")
 
+[node name="TopBarBG" type="ColorRect" parent="."]
+offset_right = 480.0
+offset_bottom = 24.0
+color = Color(0.05, 0.04, 0.09, 0.78)
+
+[node name="TopBarRule" type="ColorRect" parent="."]
+offset_top = 24.0
+offset_right = 480.0
+offset_bottom = 25.0
+color = Color(0.72, 0.56, 0.3, 0.55)
+
 [node name="TopBar" type="HBoxContainer" parent="."]
 anchors_preset = 0
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 476.0
 offset_bottom = 20.0
-theme_override_constants/separation = 8
+theme_override_constants/separation = 5
 
 [node name="DayLabel" type="Label" parent="TopBar"]
 text = "Day 1"

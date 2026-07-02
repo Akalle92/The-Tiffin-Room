@@ -190,6 +190,10 @@ func update_route(npc_id: String, updates: Dictionary) -> void:
 		return
 	for key in updates:
 		routes[npc_id][key] = updates[key]
+	# Meeting someone always opens their journal page — regardless of which
+	# first-meeting branch the player took (Desai/Arjun start locked).
+	if int(routes[npc_id].get("day_state", 0)) >= 1:
+		routes[npc_id]["unlocked"] = true
 	# Stamp the day a spirit first becomes reachable, for neglect tracking.
 	if routes[npc_id].get("spirit_unlocked", false) and int(routes[npc_id].get("spirit_unlocked_day", 0)) == 0:
 		routes[npc_id]["spirit_unlocked_day"] = day_number
