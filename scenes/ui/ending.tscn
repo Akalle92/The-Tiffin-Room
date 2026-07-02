@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/Ending.gd" id="1_ending"]
+[ext_resource type="Texture2D" path="res://assets/ui/ending_key_art.png" id="2_dawn"]
 
 [sub_resource type="StyleBoxFlat" id="Style_panel"]
 bg_color = Color(0.09, 0.075, 0.13, 0.96)
@@ -41,12 +42,21 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1_ending")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.045, 0.04, 0.09, 1)
+texture = ExtResource("2_dawn")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Scrim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.04, 0.09, 0.45)
 
 [node name="Panel" type="PanelContainer" parent="."]
 layout_mode = 1

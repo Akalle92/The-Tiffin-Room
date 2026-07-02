@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/npc/npc_spirit.tscn" id="2_spirit"]
 [ext_resource type="Texture2D" path="res://assets/tiles/cobblestone_night.png" id="3_cobble_night"]
-[ext_resource type="Texture2D" path="res://assets/tiles/tenement_facade.png" id="12_tenement"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tenement_night.png" id="12_tenement"]
 [ext_resource type="Texture2D" path="res://assets/sprites/props/chai_stall.png" id="4_chai"]
 [ext_resource type="Texture2D" path="res://assets/sprites/props/street_props.png" id="5_street"]
 [ext_resource type="Texture2D" path="res://assets/sprites/npcs/player_world.png" id="6_player_world"]
@@ -69,7 +69,6 @@ offset_bottom = 105.0
 texture = ExtResource("12_tenement")
 stretch_mode = 1
 texture_repeat = 2
-modulate = Color(0.34, 0.3, 0.62, 1)
 z_index = -1
 
 [node name="Block_NE" type="TextureRect" parent="Buildings"]
@@ -79,7 +78,6 @@ offset_bottom = 105.0
 texture = ExtResource("12_tenement")
 stretch_mode = 1
 texture_repeat = 2
-modulate = Color(0.3, 0.27, 0.58, 1)
 z_index = -1
 
 [node name="Block_SW" type="TextureRect" parent="Buildings"]
@@ -89,7 +87,6 @@ offset_bottom = 270.0
 texture = ExtResource("12_tenement")
 stretch_mode = 1
 texture_repeat = 2
-modulate = Color(0.32, 0.28, 0.6, 1)
 z_index = -1
 
 [node name="Block_SE" type="TextureRect" parent="Buildings"]
@@ -100,7 +97,6 @@ offset_bottom = 270.0
 texture = ExtResource("12_tenement")
 stretch_mode = 1
 texture_repeat = 2
-modulate = Color(0.28, 0.25, 0.56, 1)
 z_index = -1
 
 [node name="Props" type="Node2D" parent="."]

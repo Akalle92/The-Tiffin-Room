@@ -50,6 +50,10 @@ ASSETS = [
     ("hf_20260701_151804_762edabc-60ae-4c9f-98c4-18c9d90dfe16.png", "assets/tiles/tenement_facade.png",   "Tenement facade"),
     ("hf_20260701_151812_4cbae830-7d73-4a2a-8c15-ba21bd65abe7.png", "assets/tiles/temple_stone.png",      "Temple stone"),
     ("hf_20260701_151813_896ed451-69d6-40d3-923d-08689d2c1473.png", "assets/tiles/interior_floor.png",    "Interior floor"),
+    # 2026-07-02 environment variety pass (downscale to 128x128 like the tiles above)
+    ("hf_20260702_145240_611a79e5-0a3b-400d-9778-d61872f9b4fd.png", "assets/tiles/bazaar_shopfront.png",  "Bazaar shopfront (day)"),
+    ("hf_20260702_145245_3a91430f-16d8-4ea2-be93-0933b126a83b.png", "assets/tiles/temple_wall.png",       "Temple wall (day)"),
+    ("hf_20260702_145256_a432409a-d614-44c2-a873-0cf80b018b79.png", "assets/tiles/tenement_night.png",    "Tenement w/ lit windows (night)"),
     # ── PROP SPRITES (transparent) ──
     ("hf_20260701_151824_c9d67617-8de6-4826-8244-2f206b31256b.png", "assets/sprites/props/chai_stall.png",       "Chai tea stall"),
     ("hf_20260701_151829_a1bc5dc1-f0a1-44fa-a6b5-766abcfece43.png", "assets/sprites/props/municipal_office.png", "Municipal office"),
@@ -59,6 +63,7 @@ ASSETS = [
     ("hf_20260701_151853_21ea6291-d13d-49ab-8d6c-ccf081afa090.png", "assets/ui/dialogue_frame.png", "Dialogue box frame (tiffin tin)"),
     ("hf_20260701_151857_d3fbda23-6a46-4213-aa36-83be75dce37a.png", "assets/ui/journal_cover.png",  "Route journal cover"),
     ("hf_20260701_151908_8468e822-5cb4-466d-a3d6-30a56a99a975.png", "assets/ui/title_key_art.png",  "Title screen key art"),
+    ("hf_20260702_145300_77ab5a67-13e3-4c78-be52-ee8d3ae1c4e7.png", "assets/ui/ending_key_art.png", "Ending screen dawn key art"),
     # NOTE: Audio (assets/audio/sfx_*.mp3, music_day.ogg, music_night.ogg) is not
     # re-fetched here; the .mp3 SFX ship in-repo and the music was converted from the
     # original .m4a sources to .ogg via ffmpeg (see header note). Only the 2026-07

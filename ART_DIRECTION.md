@@ -48,7 +48,10 @@ slightly ethereal — same silhouette so they read as the same person.
 
 ## Environment set
 - `cobblestone_day` / `cobblestone_night` — seamless street ground tile.
-- `tenement_facade` — seamless tenement wall.
+- `tenement_facade` — seamless tenement wall (day, NW block).
+- `bazaar_shopfront` — seamless shopfront wall with awnings (day, S blocks).
+- `temple_wall` — seamless carved temple wall with marigold garlands (day, NE block).
+- `tenement_night` — seamless night tenement with warm lit windows (all night blocks).
 - `temple_stone` — seamless temple stone.
 - `interior_floor` — seamless apartment kitchen floor.
 - Props: `chai_stall`, `municipal_office`, `market_cart`, `street_lamp`.
@@ -57,3 +60,4 @@ slightly ethereal — same silhouette so they read as the same person.
 - `dialogue_frame` — a stainless tiffin-tin panel border, 9-slice, empty center.
 - `journal_cover` — worn cloth-bound delivery ledger texture.
 - `title_key_art` — hero shot: dabbawala on a bicycle in a glowing bazaar street at dusk (title screen background, 16:9).
+- `ending_key_art` — quiet dawn lane, a lone tiffin on a doorstep, marigold petals (ending screen background, 16:9).
